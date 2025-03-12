@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hangman Spiel</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Hangman Spiel</h1>
+        <div id="timer">Verstrichene Zeit: 0s</div>
+        <div id="hangman">
+            <svg id="hangman-svg" width="200" height="250"></svg>
+        </div>
+        <div id="word-display"></div>
+        <div id="letters"></div>
+        <div id="message"></div>
+        <div id="translation"></div> <!-- Neue Zeile für die deutsche Bedeutung -->
+        <button id="reset-button">Neustart</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
