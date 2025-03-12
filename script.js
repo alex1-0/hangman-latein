@@ -23,14 +23,18 @@ let timeElapsed = 0;
 let timerInterval;
 let mistakes = 0;
 let gameEnded = false; // Neuer Zustand, um das Spielende zu verfolgen
+let wins = 0; // Counter für gewonnene Spiele
+let losses = 0; // Counter für verlorene Spiele
 
 const hangmanSvg = document.getElementById("hangman-svg");
 const wordDisplay = document.getElementById("word-display");
 const lettersDiv = document.getElementById("letters");
 const messageDiv = document.getElementById("message");
-const translationDiv = document.getElementById("translation"); // Neue Zeile für die deutsche Bedeutung
+const translationDiv = document.getElementById("translation");
 const timerDiv = document.getElementById("timer");
 const resetButton = document.getElementById("reset-button");
+const winsSpan = document.getElementById("wins"); // Counter für gewonnene Spiele
+const lossesSpan = document.getElementById("losses"); // Counter für verlorene Spiele
 
 const hangmanParts = [
     { id: "gallows", draw: (svg) => drawLine(svg, 50, 220, 150, 220) }, // Galgenbasis
@@ -120,12 +124,16 @@ function checkGameStatus() {
     if (selectedWordObj.word.split("").every(letter => guessedLetters.includes(letter))) {
         messageDiv.textContent = "Gewonnen!";
         translationDiv.textContent = `Deutsche Bedeutung: ${selectedWordObj.translation}`; // Deutsche Bedeutung anzeigen
+        wins++; // Gewonnen-Counter erhöhen
+        winsSpan.textContent = wins; // Gewonnen-Counter aktualisieren
         gameEnded = true; // Spiel beenden
         clearInterval(timerInterval);
         disableLetterButtons();
     } else if (mistakes >= hangmanParts.length) {
         messageDiv.textContent = `Verloren! Das Wort war: ${selectedWordObj.word}`;
         translationDiv.textContent = `Deutsche Bedeutung: ${selectedWordObj.translation}`; // Deutsche Bedeutung anzeigen
+        losses++; // Verloren-Counter erhöhen
+        lossesSpan.textContent = losses; // Verloren-Counter aktualisieren
         gameEnded = true; // Spiel beenden
         clearInterval(timerInterval);
         disableLetterButtons();
