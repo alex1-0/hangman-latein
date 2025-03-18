@@ -392,7 +392,7 @@ const words = [
     { word: "REDDERE", translation: "zurückgeben, geben; (m. doppeltem Akk.) jmdn. zu etw. machen" },
     { word: "TALIS", translation: "derartig, ein solcher, so (beschaffen)" },
     { word: "UT", translation: "sobald; sooft" },
-        { word: "ALIENUS", translation: "fremd" },
+    { word: "ALIENUS", translation: "fremd" },
     { word: "AUFERRE", translation: "wegbringen, rauben" },
     { word: "CASUS", translation: "der Fall, der Zufall" },
     { word: "COMPLURES", translation: "mehrere" },
