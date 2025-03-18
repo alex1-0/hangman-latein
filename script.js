@@ -1,6 +1,6 @@
 // Hier können Sie die Wortliste erweitern
 const words = [
-    { word: "ADESSE", translation: "da sein, helfen" },
+    { word: "ADESSE", translation: "da sein, helfen " },
     { word: "AUDERE", translation: "wagen" },
     { word: "CUR", translation: "warum" },
     { word: "DEBERE", translation: "müssen, sollen, schulden" },
