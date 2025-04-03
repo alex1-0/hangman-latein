@@ -606,6 +606,10 @@ function drawCircle(svg, cx, cy, r) {
 
 // Spracherkennungsfunktionen
 function initSpeechRecognition() {
+    if (!navigator.onLine) {
+        alert("Keine Internetverbindung - Spracherkennung benötigt Netzwerkzugriff");
+        return false;
+    }
     // Browserkompatibilität prüfen
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     
@@ -715,6 +719,17 @@ function stopVoiceRecognition() {
     recognitionActive = false;
     recognition.stop();
 }
+
+// Am Ende des Scripts hinzufügen:
+window.addEventListener('online', () => {
+    if (recognitionActive && !isListening) {
+        recognition.start();
+    }
+});
+
+window.addEventListener('offline', () => {
+    document.getElementById("voice-status").textContent = "Offline - Spracherkennung nicht verfügbar";
+});
 
 // 2. In der init()-Funktion diese Zeile hinzufügen:
 function init()
