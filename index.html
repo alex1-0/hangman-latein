@@ -3,9 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Permissions-Policy" content="microphone=()">
     <title>Geigemännchen Spiel</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        #score {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            color: #7f8c8d;
+        }
+
+        #timer {
+            font-size: 1em;
+            margin-bottom: 20px;
+            color: #7f8c8d;
+        }
+
+        #hangman {
+            margin: 25px 0;
+            min-height: 250px;
+        }
+
+        #hangman-svg {
+            display: block;
+            margin: 0 auto;
+        }
+
+        #word-display {
+            font-size: 2.2em;
+            letter-spacing: 8px;
+            margin: 25px 0;
+            font-weight: bold;
+            color: #2c3e50;
+            min-height: 50px;
+        }
+
+        #letters {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            margin: 20px 0;
+        }
+
+        .letter-button {
+            width: 40px;
+            height: 40px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .letter-button:hover:not(:disabled) {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .letter-button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .letter-button.active {
+            background-color: #2ecc71;
+        }
+
+        .letter-button.wrong {
+            background-color: #e74c3c;
+        }
+
+        #message {
+            font-size: 1.3em;
+            margin: 20px 0;
+            min-height: 30px;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        #translation {
+            font-size: 1.1em;
+            margin: 15px 0;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .action-button {
+            padding: 10px 25px;
+            font-size: 1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        #reset-button {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        #reset-button:hover {
+            background-color: #27ae60;
+        }
+
+        #voice-button {
+            background-color: #9b59b6;
+            color: white;
+        }
+
+        #voice-button:hover {
+            background-color: #8e44ad;
+        }
+
+        #voice-button.listening {
+            animation: pulse 1.5s infinite;
+        }
+
+        #voice-status {
+            margin: 10px 0;
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(155, 89, 182, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(155, 89, 182, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(155, 89, 182, 0); }
+        }
+
+        .keyboard-hint {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #95a5a6;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -21,10 +188,380 @@
         <div id="letters"></div>
         <div id="message"></div>
         <div id="translation"></div>
-        <button id="reset-button">Neustart</button>
-        <button id="voice-button">Spracherkennung starten</button>
         <div id="voice-status">Spracherkennung: Inaktiv</div>
+        <div class="button-group">
+            <button id="reset-button" class="action-button">Neustart</button>
+            <button id="voice-button" class="action-button">Spracherkennung starten</button>
+        </div>
+        <div class="keyboard-hint">Tipp: Sie können Buchstaben auch mit der Tastatur eingeben</div>
     </div>
-    <script src="script.js"></script>
+
+    <script>
+        // Wortliste (Beispiel - erweitern Sie diese)
+        const words = [
+            { word: "AUTO", translation: "Fahrzeug mit vier Rädern" },
+            { word: "BAUM", translation: "Pflanze mit Stamm und Blättern" },
+            { word: "COMPUTER", translation: "Elektronisches Gerät zur Datenverarbeitung" },
+            { word: "DACH", translation: "Oberer Abschluss eines Gebäudes" },
+            { word: "ELEFANT", translation: "Großes Säugetier mit Rüssel" }
+        ];
+
+        // Spielvariablen
+        let selectedWordObj = null;
+        let lastWord = "";
+        let guessedLetters = [];
+        let timeElapsed = 0;
+        let timerInterval;
+        let mistakes = 0;
+        let gameEnded = false;
+        let wins = 0;
+        let losses = 0;
+        let recognition;
+        let isListening = false;
+        let recognitionActive = false;
+
+        // DOM-Elemente
+        const hangmanSvg = document.getElementById("hangman-svg");
+        const wordDisplay = document.getElementById("word-display");
+        const lettersDiv = document.getElementById("letters");
+        const messageDiv = document.getElementById("message");
+        const translationDiv = document.getElementById("translation");
+        const timerDiv = document.getElementById("timer");
+        const resetButton = document.getElementById("reset-button");
+        const voiceButton = document.getElementById("voice-button");
+        const voiceStatus = document.getElementById("voice-status");
+        const winsSpan = document.getElementById("wins");
+        const lossesSpan = document.getElementById("losses");
+
+        // Galgen-Teile
+        const hangmanParts = [
+            { id: "gallows", draw: (svg) => drawLine(svg, 50, 220, 150, 220) },
+            { id: "pole", draw: (svg) => drawLine(svg, 100, 220, 100, 50) },
+            { id: "beam", draw: (svg) => drawLine(svg, 100, 50, 150, 50) },
+            { id: "rope", draw: (svg) => drawLine(svg, 150, 50, 150, 70) },
+            { id: "head", draw: (svg) => drawCircle(svg, 150, 90, 20) },
+            { id: "body", draw: (svg) => drawLine(svg, 150, 110, 150, 170) },
+            { id: "left-arm", draw: (svg) => drawLine(svg, 150, 130, 120, 150) },
+            { id: "right-arm", draw: (svg) => drawLine(svg, 150, 130, 180, 150) },
+            { id: "left-leg", draw: (svg) => drawLine(svg, 150, 170, 120, 200) },
+            { id: "right-leg", draw: (svg) => drawLine(svg, 150, 170, 180, 200) }
+        ];
+
+        // Initialisierung
+        function init() {
+            selectedWordObj = getRandomWord();
+            guessedLetters = [];
+            mistakes = 0;
+            timeElapsed = 0;
+            gameEnded = false;
+            
+            clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+            
+            updateWordDisplay();
+            createLetterButtons();
+            updateHangmanDisplay();
+            
+            messageDiv.textContent = "";
+            translationDiv.textContent = "";
+            timerDiv.textContent = `Verstrichene Zeit: ${timeElapsed}s`;
+            
+            resetHangman();
+            stopVoiceRecognition();
+            
+            // Fokus auf den ersten Button setzen für bessere Tastaturnavigation
+            const firstButton = document.querySelector(".letter-button");
+            if (firstButton) firstButton.focus();
+        }
+
+        // Zufälliges Wort auswählen
+        function getRandomWord() {
+            let newWordObj;
+            do {
+                newWordObj = words[Math.floor(Math.random() * words.length)];
+            } while (newWordObj.word === lastWord && words.length > 1);
+            lastWord = newWordObj.word;
+            return newWordObj;
+        }
+
+        // Wortanzeige aktualisieren
+        function updateWordDisplay() {
+            wordDisplay.textContent = selectedWordObj.word
+                .split("")
+                .map(letter => guessedLetters.includes(letter) ? letter : "_")
+                .join(" ");
+        }
+
+        // Buchstaben-Buttons erstellen
+        function createLetterButtons() {
+            lettersDiv.innerHTML = "";
+            
+            for (let i = 65; i <= 90; i++) {
+                const letter = String.fromCharCode(i);
+                const button = document.createElement("button");
+                button.textContent = letter;
+                button.classList.add("letter-button");
+                button.dataset.letter = letter;
+                
+                // Click-Event
+                button.addEventListener("click", () => guessLetter(letter, button));
+                
+                // Tastatur-Fokus
+                button.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        guessLetter(letter, button);
+                    }
+                });
+                
+                if (gameEnded || guessedLetters.includes(letter)) {
+                    button.disabled = true;
+                    if (!selectedWordObj.word.includes(letter)) {
+                        button.classList.add("wrong");
+                    }
+                }
+                
+                lettersDiv.appendChild(button);
+            }
+        }
+
+        // Buchstaben raten
+        function guessLetter(letter, button) {
+            if (!guessedLetters.includes(letter) && !gameEnded) {
+                guessedLetters.push(letter);
+                
+                // Button-Status aktualisieren
+                const allButtons = document.querySelectorAll(".letter-button");
+                allButtons.forEach(btn => {
+                    if (btn.dataset.letter === letter) {
+                        btn.disabled = true;
+                        if (!selectedWordObj.word.includes(letter)) {
+                            btn.classList.add("wrong");
+                            mistakes++;
+                            updateHangmanDisplay();
+                        } else {
+                            btn.classList.add("active");
+                        }
+                    }
+                });
+                
+                updateWordDisplay();
+                checkGameStatus();
+            }
+        }
+
+        // Galgen aktualisieren
+        function updateHangmanDisplay() {
+            if (mistakes > 0 && mistakes <= hangmanParts.length) {
+                hangmanParts[mistakes - 1].draw(hangmanSvg);
+            }
+        }
+
+        // Galgen zurücksetzen
+        function resetHangman() {
+            hangmanSvg.innerHTML = "";
+        }
+
+        // Spielstatus prüfen
+        function checkGameStatus() {
+            if (selectedWordObj.word.split("").every(letter => guessedLetters.includes(letter))) {
+                // Gewonnen
+                messageDiv.textContent = "Gewonnen!";
+                translationDiv.textContent = `Deutsche Bedeutung: ${selectedWordObj.translation}`;
+                wins++;
+                winsSpan.textContent = wins;
+                gameEnded = true;
+                clearInterval(timerInterval);
+                disableLetterButtons();
+                stopVoiceRecognition();
+            } else if (mistakes >= hangmanParts.length) {
+                // Verloren
+                messageDiv.textContent = `Verloren! Das Wort war: ${selectedWordObj.word}`;
+                translationDiv.textContent = `Deutsche Bedeutung: ${selectedWordObj.translation}`;
+                losses++;
+                lossesSpan.textContent = losses;
+                gameEnded = true;
+                clearInterval(timerInterval);
+                disableLetterButtons();
+                stopVoiceRecognition();
+                
+                // Alle Buchstaben anzeigen
+                const missingLetters = selectedWordObj.word.split("")
+                    .filter(letter => !guessedLetters.includes(letter));
+                
+                missingLetters.forEach(letter => {
+                    const buttons = document.querySelectorAll(".letter-button");
+                    buttons.forEach(btn => {
+                        if (btn.dataset.letter === letter) {
+                            btn.classList.add("wrong");
+                        }
+                    });
+                });
+            }
+        }
+
+        // Alle Buchstaben-Buttons deaktivieren
+        function disableLetterButtons() {
+            const buttons = document.querySelectorAll(".letter-button");
+            buttons.forEach(button => {
+                button.disabled = true;
+            });
+        }
+
+        // Timer aktualisieren
+        function updateTimer() {
+            if (!gameEnded) {
+                timeElapsed++;
+                timerDiv.textContent = `Verstrichene Zeit: ${timeElapsed}s`;
+            }
+        }
+
+        // SVG-Funktionen
+        function drawLine(svg, x1, y1, x2, y2) {
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", x1);
+            line.setAttribute("y1", y1);
+            line.setAttribute("x2", x2);
+            line.setAttribute("y2", y2);
+            line.setAttribute("stroke", "black");
+            line.setAttribute("stroke-width", "2");
+            svg.appendChild(line);
+        }
+
+        function drawCircle(svg, cx, cy, r) {
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("cx", cx);
+            circle.setAttribute("cy", cy);
+            circle.setAttribute("r", r);
+            circle.setAttribute("stroke", "black");
+            circle.setAttribute("stroke-width", "2");
+            circle.setAttribute("fill", "transparent");
+            svg.appendChild(circle);
+        }
+
+        // Spracherkennung
+        function initSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!SpeechRecognition) {
+                voiceStatus.textContent = "Spracherkennung nicht unterstützt";
+                return false;
+            }
+
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = false;
+            recognition.lang = "de-DE";
+
+            recognition.onstart = () => {
+                isListening = true;
+                recognitionActive = true;
+                voiceStatus.textContent = "Spracherkennung: Aktiv (Buchstaben sprechen)";
+                voiceButton.classList.add("listening");
+            };
+
+            recognition.onend = () => {
+                if (recognitionActive) {
+                    recognition.start(); // Automatisch neu starten
+                } else {
+                    isListening = false;
+                    voiceStatus.textContent = "Spracherkennung: Inaktiv";
+                    voiceButton.classList.remove("listening");
+                }
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[event.results.length - 1][0].transcript;
+                const spokenText = transcript.trim().toUpperCase();
+                
+                // Jeden Buchstaben im erkannten Text verarbeiten
+                for (const char of spokenText) {
+                    if (/^[A-ZÄÖÜ]$/.test(char)) {
+                        processSpokenLetter(char);
+                    }
+                }
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Spracherkennungsfehler:", event.error);
+                if (event.error === 'not-allowed') {
+                    voiceStatus.textContent = "Mikrofon-Zugriff wurde blockiert";
+                } else {
+                    voiceStatus.textContent = `Fehler: ${event.error}`;
+                }
+                voiceButton.classList.remove("listening");
+                recognitionActive = false;
+            };
+
+            return true;
+        }
+
+        function processSpokenLetter(letter) {
+            if (gameEnded) return;
+            
+            const buttons = document.querySelectorAll(".letter-button");
+            for (const button of buttons) {
+                if (button.textContent === letter && !button.disabled) {
+                    button.focus();
+                    guessLetter(letter, button);
+                    break;
+                }
+            }
+        }
+
+        function toggleVoiceRecognition() {
+            if (!recognition) {
+                if (!initSpeechRecognition()) return;
+            }
+
+            if (isListening) {
+                stopVoiceRecognition();
+            } else {
+                startVoiceRecognition();
+            }
+        }
+
+        function startVoiceRecognition() {
+            recognitionActive = true;
+            try {
+                recognition.start();
+                voiceStatus.textContent = "Spracherkennung wird gestartet...";
+            } catch (e) {
+                console.error("Startfehler:", e);
+                voiceStatus.textContent = "Fehler beim Starten der Spracherkennung";
+            }
+        }
+
+        function stopVoiceRecognition() {
+            recognitionActive = false;
+            if (recognition) {
+                recognition.stop();
+            }
+        }
+
+        // Tastatur-Ereignisse
+        document.addEventListener("keydown", (e) => {
+            if (gameEnded) return;
+            
+            // Nur Buchstaben A-Z (Großbuchstaben)
+            if (e.keyCode >= 65 && e.keyCode <= 90) {
+                const letter = e.key.toUpperCase();
+                const buttons = document.querySelectorAll(".letter-button");
+                
+                for (const button of buttons) {
+                    if (button.textContent === letter && !button.disabled) {
+                        guessLetter(letter, button);
+                        break;
+                    }
+                }
+            }
+        });
+
+        // Event-Listener für Buttons
+        resetButton.addEventListener("click", init);
+        voiceButton.addEventListener("click", toggleVoiceRecognition);
+
+        // Initialisierung beim Laden
+        document.addEventListener("DOMContentLoaded", init);
+    </script>
 </body>
 </html>
