@@ -604,7 +604,6 @@ function drawCircle(svg, cx, cy, r) {
 }
 
 function initSpeechRecognition() {
-    // Browserkompatibilität prüfen
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     
     if (!SpeechRecognition) {
@@ -613,30 +612,40 @@ function initSpeechRecognition() {
     }
 
     recognition = new SpeechRecognition();
-    recognition.continuous = false;
+    recognition.continuous = true; // Wichtig: kontinuierliche Erkennung
     recognition.interimResults = false;
-    recognition.lang = "de-DE"; // Deutsch als Sprache
+    recognition.lang = "de-DE";
 
     recognition.onstart = () => {
         isListening = true;
-        document.getElementById("voice-status").textContent = "Spracherkennung: Aktiv";
+        document.getElementById("voice-status").textContent = "Spracherkennung: Aktiv (sprich Buchstaben)";
+        console.log("Spracherkennung aktiv");
     };
 
     recognition.onend = () => {
         isListening = false;
         document.getElementById("voice-status").textContent = "Spracherkennung: Inaktiv";
+        console.log("Spracherkennung beendet");
     };
 
     recognition.onresult = (event) => {
-        const spokenLetter = event.results[0][0].transcript.trim().toUpperCase();
-        
-        // Nur Buchstaben A-Z akzeptieren
-        if (/^[A-ZÄÖÜ]$/.test(spokenLetter)) {
-            // Finde den entsprechenden Button und "klicke" ihn
+        const transcript = event.results[event.results.length - 1][0].transcript;
+        const spokenLetter = transcript.trim().toUpperCase();
+        console.log("Erkannt:", spokenLetter);
+
+        // Bessere Buchstabenerkennung
+        const letter = spokenLetter.length === 1 ? spokenLetter : 
+                       spokenLetter.includes("A") ? "A" :
+                       spokenLetter.includes("B") ? "B" :
+                       // ... alle Buchstaben entsprechend
+                       null;
+
+        if (letter && /^[A-ZÄÖÜ]$/.test(letter)) {
+            console.log("Verarbeite Buchstabe:", letter);
             const buttons = document.querySelectorAll(".letter-button");
             for (const button of buttons) {
-                if (button.textContent === spokenLetter && !button.disabled) {
-                    guessLetter(spokenLetter, button);
+                if (button.textContent === letter && !button.disabled) {
+                    button.click(); // Direkt den Button klicken
                     break;
                 }
             }
@@ -660,14 +669,8 @@ function toggleVoiceRecognition() {
         try {
             recognition.start();
         } catch (e) {
-            console.error("Fehler beim Starten der Spracherkennung:", e);
+            console.error("Fehler:", e);
+            alert("Spracherkennung konnte nicht gestartet werden: " + e.message);
         }
     }
 }
-
-// Füge den Event-Listener für den Voice-Button hinzu
-document.getElementById("voice-button").addEventListener("click", toggleVoiceRecognition);
-
-resetButton.addEventListener("click", init);
-
-init();
