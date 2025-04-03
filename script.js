@@ -606,11 +606,15 @@ function drawCircle(svg, cx, cy, r) {
 
 // Spracherkennungsfunktionen
 function initSpeechRecognition() {
-    if (!navigator.onLine) {
-        alert("Keine Internetverbindung - Spracherkennung benötigt Netzwerkzugriff");
+    // Brave-spezifische Erkennung
+    const isBrave = navigator.brave && await navigator.brave.isBrave();
+    
+    if (isBrave) {
+        console.warn("Brave Browser erkannt - Spezielle Handhabung");
+        document.getElementById("voice-status").textContent = "Brave: Bitte Schutzschilde temporär deaktivieren";
         return false;
     }
-    // Browserkompatibilität prüfen
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     
     if (!SpeechRecognition) {
@@ -619,7 +623,7 @@ function initSpeechRecognition() {
     }
 
     recognition = new SpeechRecognition();
-    recognition.continuous = true; // WICHTIG: Kontinuierliche Erkennung
+    recognition.continuous = true;
     recognition.interimResults = false;
     recognition.lang = "de-DE";
 
