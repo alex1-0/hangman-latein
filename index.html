@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geigemännchen Spiel</title>
+    <title>Galgenmännchen Spiel</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -17,166 +17,222 @@
         }
 
         .container {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            padding: 30px;
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 800px;
-            text-align: center;
         }
 
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 10px;
+        #settings-panel {
+            display: none;
+            margin: 20px auto;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            max-width: 500px;
+        }
+
+        #settings-panel h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .settings-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .settings-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .settings-group select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background: white;
         }
 
         #score {
-            font-size: 1.1em;
+            font-size: 1.2em;
             margin-bottom: 20px;
-            color: #7f8c8d;
         }
 
         #timer {
             font-size: 1em;
             margin-bottom: 20px;
-            color: #7f8c8d;
         }
 
         #hangman {
-            margin: 25px 0;
-            min-height: 250px;
+            margin: 20px 0;
         }
 
         #hangman-svg {
-            display: block;
-            margin: 0 auto;
+            width: 200px;
+            height: 250px;
         }
 
         #word-display {
-            font-size: 2.2em;
-            letter-spacing: 8px;
-            margin: 25px 0;
-            font-weight: bold;
-            color: #2c3e50;
+            font-size: 2em;
+            margin: 20px 0;
+            letter-spacing: 10px;
             min-height: 50px;
         }
 
         #letters {
+            margin: 20px 0;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 6px;
-            margin: 20px 0;
+            gap: 5px;
         }
 
         .letter-button {
-            width: 40px;
-            height: 40px;
             font-size: 1.2em;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            background-color: #3498db;
-            color: white;
+            padding: 10px;
+            width: 40px;
             cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
             transition: all 0.2s;
         }
 
         .letter-button:hover:not(:disabled) {
-            background-color: #2980b9;
-            transform: translateY(-2px);
+            background-color: #0056b3;
         }
 
         .letter-button:disabled {
-            background-color: #bdc3c7;
+            background-color: #ccc;
             cursor: not-allowed;
-            opacity: 0.7;
         }
 
-        .letter-button.active {
-            background-color: #2ecc71;
+        .letter-button.correct {
+            background-color: #28a745;
         }
 
         .letter-button.wrong {
-            background-color: #e74c3c;
+            background-color: #dc3545;
         }
 
         #message {
-            font-size: 1.3em;
+            font-size: 1.5em;
             margin: 20px 0;
             min-height: 30px;
-            color: #2c3e50;
-            font-weight: bold;
         }
 
         #translation {
-            font-size: 1.1em;
-            margin: 15px 0;
-            color: #7f8c8d;
-            font-style: italic;
+            font-size: 1.2em;
+            margin: 20px 0;
+            color: #555;
         }
 
         .button-group {
             display: flex;
             justify-content: center;
-            gap: 15px;
+            gap: 10px;
             margin-top: 20px;
+            flex-wrap: wrap;
         }
 
         .action-button {
-            padding: 10px 25px;
+            padding: 10px 20px;
             font-size: 1em;
-            border: none;
-            border-radius: 8px;
             cursor: pointer;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
             transition: all 0.2s;
         }
 
+        .action-button:hover {
+            background-color: #5a6268;
+        }
+
         #reset-button {
-            background-color: #2ecc71;
-            color: white;
+            background-color: #28a745;
         }
 
         #reset-button:hover {
-            background-color: #27ae60;
+            background-color: #218838;
         }
 
         #voice-button {
-            background-color: #9b59b6;
-            color: white;
+            background-color: #17a2b8;
         }
 
         #voice-button:hover {
-            background-color: #8e44ad;
+            background-color: #138496;
         }
 
         #voice-button.listening {
+            background-color: #dc3545;
             animation: pulse 1.5s infinite;
+        }
+
+        #settings-button {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        #settings-button:hover {
+            background-color: #e0a800;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
 
         #voice-status {
             margin: 10px 0;
             font-size: 0.9em;
-            color: #7f8c8d;
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(155, 89, 182, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(155, 89, 182, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(155, 89, 182, 0); }
-        }
-
-        .keyboard-hint {
-            margin-top: 15px;
-            font-size: 0.9em;
-            color: #95a5a6;
+            color: #666;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Hermann Spiel</h1>
+        <h1>Galgenmännchen Spiel</h1>
+        
+        <div id="settings-panel">
+            <h3>Spieleinstellungen</h3>
+            
+            <div class="settings-group">
+                <label for="display-mode">Schwierigkeitsgrad (Galgenteile):</label>
+                <select id="display-mode">
+                    <option value="1">Schwer (Einzelne Teile)</option>
+                    <option value="2">Mittel (2 Teile auf einmal)</option>
+                    <option value="3">Einfach (3 Teile auf einmal)</option>
+                    <option value="all">Sehr einfach (Alle Teile sichtbar)</option>
+                </select>
+            </div>
+            
+            <div class="settings-group">
+                <label for="word-length">Wortlänge bevorzugen:</label>
+                <select id="word-length">
+                    <option value="any">Beliebig</option>
+                    <option value="short">Kurze Wörter (3-5 Buchstaben)</option>
+                    <option value="medium">Mittlere Wörter (6-8 Buchstaben)</option>
+                    <option value="long">Lange Wörter (9+ Buchstaben)</option>
+                </select>
+            </div>
+            
+            <button id="save-settings" class="action-button">Einstellungen speichern</button>
+        </div>
+        
         <div id="score">
             Gewonnen: <span id="wins">0</span> | Verloren: <span id="losses">0</span>
         </div>
@@ -189,27 +245,467 @@
         <div id="message"></div>
         <div id="translation"></div>
         <div id="voice-status">Spracherkennung: Inaktiv</div>
+        
         <div class="button-group">
             <button id="reset-button" class="action-button">Neustart</button>
-            <button id="voice-button" class="action-button">Spracherkennung starten</button>
+            <button id="voice-button" class="action-button">Spracherkennung</button>
+            <button id="settings-button" class="action-button">Einstellungen</button>
         </div>
-        <div class="keyboard-hint">Tipp: Sie können Buchstaben auch mit der Tastatur eingeben</div>
     </div>
 
     <script>
-        // Wortliste (Beispiel - erweitern Sie diese)
+        // Erweiterte Wortliste mit verschiedenen Längen
         const words = [
-            { word: "AUTO", translation: "Fahrzeug mit vier Rädern" },
-            { word: "BAUM", translation: "Pflanze mit Stamm und Blättern" },
-            { word: "COMPUTER", translation: "Elektronisches Gerät zur Datenverarbeitung" },
-            { word: "DACH", translation: "Oberer Abschluss eines Gebäudes" },
-            { word: "ELEFANT", translation: "Großes Säugetier mit Rüssel" },
-            { word: "ESSE", translation: "sein, sich befinden" }
-        ];
+    { word: "ADESSE", translation: "da sein; helfen" },
+    { word: "AUDERE", translation: "wagen" },
+    { word: "CUR", translation: "warum?" },
+    { word: "DEBERE", translation: "müssen, sollen, schulden" },
+    { word: "DOMINUS", translation: "der Herr" },
+    { word: "DUBITARE", translation: "zögern; zweifeln" },
+    { word: "EQUUS", translation: "das Pferd" },
+    { word: "ESSE", translation: "sein, sich befinden" },
+    { word: "ET", translation: "und, auch" },
+    { word: "ETIAM", translation: "auch, sogar; (m. Komparativ) noch" },
+    { word: "HUC", translation: "hierher" },
+    { word: "IAM", translation: "schon, bereits, nun" },
+    { word: "IBI", translation: "dort, da" },
+    { word: "ITAQUE", translation: "deshalb" },
+    { word: "NON", translation: "nicht" },
+    { word: "ORARE", translation: "bitten, beten; anbeten" },
+    { word: "POPULUS", translation: "das Volk" },
+    { word: "SED", translation: "aber, sondern" },
+    { word: "SERVUS", translation: "der Sklave, der Diener" },
+    { word: "SOLUM", translation: "nur" },
+    { word: "STARE", translation: "stehen" },
+    { word: "TANDEM", translation: "endlich, schließlich" },
+    { word: "TUM", translation: "da, dann, damals" },
+    { word: "VENIRE", translation: "kommen" },
+    { word: "VICTORIA", translation: "der Sieg" },
+    { word: "VIDERE", translation: "sehen" },
+    { word: "AD", translation: "zu, nach, bei, an" },
+    { word: "AMICUS", translation: "der Freund" },
+    { word: "ANTE", translation: "vor" },
+    { word: "AUDIRE", translation: "hören" },
+    { word: "DARE", translation: "geben" },
+    { word: "DIU", translation: "lange, lange Zeit" },
+    { word: "EGO", translation: "ich" },
+    { word: "EXSPECTARE", translation: "warten (auf), erwarten" },
+    { word: "ITA", translation: "so" },
+    { word: "NAM", translation: "denn" },
+    { word: "NONIAM", translation: "nicht mehr" },
+    { word: "NUNC", translation: "jetzt, nun" },
+    { word: "PECUNIA", translation: "das Geld, das Vermögen" },
+    { word: "PER", translation: "durch" },
+    { word: "POST", translation: "hinter, nach" },
+    { word: "POSTULARE", translation: "fordern" },
+    { word: "REPERIRE", translation: "finden, wiederfinden" },
+    { word: "ROGARE", translation: "fragen, bitten" },
+    { word: "SATIS", translation: "genug" },
+    { word: "SCIRE", translation: "wissen, kennen, verstehen" },
+    { word: "SEMPER", translation: "immer" },
+    { word: "TENERE", translation: "halten, festhalten, besitzen" },
+    { word: "TU", translation: "du" },
+    { word: "UBI", translation: "wo?" },
+    { word: "VALERE", translation: "gesund sein, stark sein, Einfluss haben" },
+    { word: "VIA", translation: "der Weg, die Straße" },
+    { word: "ANIMUS", translation: "der Geist; der Mut; die Gesinnung" },
+    { word: "BENE", translation: "gut" },
+    { word: "DUM", translation: "während, solange, bis" },
+    { word: "ET … ET", translation: "sowohl … als auch" },
+    { word: "GRATIA", translation: "der Dank; die Gnade" },
+    { word: "INIURIA", translation: "das Unrecht; die Beleidigung" },
+    { word: "NEGARE", translation: "leugnen, verneinen; verweigern" },
+    { word: "PARARE", translation: "(vor)bereiten, vorhaben; erwerben" },
+    { word: "PAULO", translation: "(um) ein wenig" },
+    { word: "POENA", translation: "die Strafe" },
+    { word: "PROHIBERE", translation: "abhalten, hindern, verhindern" },
+    { word: "RESPONDERE", translation: "antworten" },
+    { word: "SENTENTIA", translation: "die Meinung; der Satz; der Sinn" },
+    { word: "SOCIUS", translation: "der Gefährte, der Verbündete" },
+    { word: "SUPERARE", translation: "besiegen, überwinden, übertreffen" },
+    { word: "SUSTINERE", translation: "ertragen, standhalten" },
+    { word: "UNA", translation: "zusammen, zugleich" },
+    { word: "VOCARE", translation: "rufen, nennen, benennen" },
+    { word: "AMARE", translation: "lieben" },
+    { word: "APPELLARE", translation: "rufen, anrufen, nennen" },
+    { word: "AT", translation: "aber, jedoch" },
+    { word: "ATQUE/AC", translation: "und, und auch; (im Vergleich) wie, als" },
+    { word: "CUM", translation: "mit, zusammen mit" },
+    { word: "DE", translation: "über; von, von … her, von … weg, von … herab" },
+    { word: "E/EX", translation: "aus, von … her" },
+    { word: "ENIM", translation: "denn, nämlich" },
+    { word: "FUGA", translation: "die Flucht" },
+    { word: "IN", translation: "in, an, auf, bei (wo?)" },
+    { word: "IN", translation: "in (… hinein), nach (wohin?); gegen" },
+    { word: "MEMORIA", translation: "die Erinnerung; das Gedächtnis; die Zeit" },
+    { word: "MOVERE", translation: "bewegen, beeindrucken" },
+    { word: "NESCIRE", translation: "nicht wissen, nicht kennen, nicht verstehen" },
+    { word: "NOLLE", translation: "nicht wollen" },
+    { word: "OCULUS", translation: "das Auge" },
+    { word: "PROCUL", translation: "von fern; weit weg" },
+    { word: "PROPE", translation: "nahe, in der Nähe; beinahe" },
+    { word: "PROPTER", translation: "wegen" },
+    { word: "-QUE", translation: "und" },
+    { word: "SENTIRE", translation: "fühlen, meinen, wahrnehmen" },
+    { word: "SILVA", translation: "der Wald" },
+    { word: "TAMEN", translation: "dennoch, jedoch" },
+    { word: "TIBI", translation: "dir, für dich" },
+    { word: "TIMERE", translation: "fürchten, Angst haben (vor)" },
+    { word: "VELLE", translation: "wollen" },
+    { word: "A/AB", translation: "von, von … her" },
+    { word: "ADHUC", translation: "bis jetzt, (immer) noch" },
+    { word: "AUTEM", translation: "aber, andererseits" },
+    { word: "CAELUM", translation: "der Himmel" },
+    { word: "COGERE", translation: "zwingen (etw. zu tun); (ver)sammeln" },
+    { word: "COGNOSCERE", translation: "erkennen, kennen lernen; (Perf. auch) kennen, wissen" },
+    { word: "COLERE", translation: "verehren; bewirtschaften, pflegen" },
+    { word: "CONSILIUM", translation: "die Beratung; der Beschluss, der Plan, der Rat" },
+    { word: "CONSTITUERE", translation: "aufstellen, gründen, festsetzen, beschließen" },
+    { word: "COPIA", translation: "die Menge; der Vorrat; (Pl. auch) die Truppen" },
+    { word: "DEUS", translation: "der Gott, die Gottheit" },
+    { word: "DICERE", translation: "sagen, sprechen; (m. dopp. Akk.) nennen, bezeichnen (als)" },
+    { word: "DUCERE", translation: "führen, ziehen; (m. doppeltem Akk.) halten für" },
+    { word: "IMPERIUM", translation: "der Befehl; die Herrschaft; das Reich" },
+    { word: "INVENIRE", translation: "finden, erfinden" },
+    { word: "LEGERE", translation: "lesen; auswählen" },
+    { word: "NATURA", translation: "die Natur, das Wesen, die Beschaffenheit" },
+    { word: "NEQUE", translation: "und nicht, auch nicht" },
+    { word: "OPERA", translation: "die Arbeit, die Mühe" },
+    { word: "OPPIDUM", translation: "die Stadt, die Kleinstadt" },
+    { word: "OSTENDERE", translation: "zeigen, erklären" },
+    { word: "PETERE", translation: "bitten; verlangen; streben (nach); aufsuchen; angreifen" },
+    { word: "POSTEA", translation: "nachher, später" },
+    { word: "QUASI", translation: "gleichsam, wie" },
+    { word: "RESISTERE", translation: "Widerstand leisten; stehen bleiben" },
+    { word: "SCRIBERE", translation: "schreiben, beschreiben" },
+    { word: "SINE", translation: "ohne" },
+    { word: "TERRA", translation: "die Erde, das Land" },
+    { word: "VERBUM", translation: "das Wort, die Äußerung" },
+    { word: "VITA", translation: "das Leben" },
+    { word: "VIVERE", translation: "leben" },
+    { word: "NE", translation: "Fragesignal (wird nicht übersetzt)" },
+    { word: "ACCIPERE", translation: "erhalten, erfahren, annehmen" },
+    { word: "APUD", translation: "bei" },
+    { word: "BONUS", translation: "gut; tüchtig" },
+    { word: "CAPERE", translation: "nehmen, fassen, ergreifen, erobern" },
+    { word: "CETERI", translation: "die übrigen" },
+    { word: "CUPERE", translation: "wollen, wünschen, verlangen" },
+    { word: "FAMA", translation: "der (gut/schlechte) Ruf; das Gerücht" },
+    { word: "FORTUNA", translation: "das Glück; das Schicksal" },
+    { word: "GLORIA", translation: "der Ruhm, die Ehre" },
+    { word: "HABERE", translation: "haben, halten" },
+    { word: "INCIPERE", translation: "anfangen, beginnen" },
+    { word: "INTER", translation: "unter; während; zwischen" },
+    { word: "LAUDARE", translation: "loben" },
+    { word: "LIBERI", translation: "die Kinder" },
+    { word: "MAGNUS", translation: "groß, bedeutend" },
+    { word: "ME", translation: "mich" },
+    { word: "MEUS", translation: "mein" },
+    { word: "MIHI", translation: "mir, für mich" },
+    { word: "MISER", translation: "arm, erbärmlich, unglücklich" },
+    { word: "MODUS", translation: "die Art, die Weise; das Maß" },
+    { word: "MULTUS", translation: "viel" },
+    { word: "NULLUS", translation: "kein" },
+    { word: "PARVUS", translation: "klein, gering" },
+    { word: "PUER", translation: "der Junge" },
+    { word: "QUAM", translation: "als, wie; (m. Superlativ) möglichst" },
+    { word: "QUIDEM", translation: "freilich, gewiss, wenigstens, zwar" },
+    { word: "QUIS", translation: "wer?" },
+    { word: "QUID", translation: "was?" },
+    { word: "QUOQUE", translation: "auch" },
+    { word: "SUPERI", translation: "die Götter" },
+    { word: "TE", translation: "dich" },
+    { word: "TEMPLUM", translation: "der Tempel" },
+    { word: "VIR", translation: "der Mann" },
+    { word: "ABESSE", translation: "abwesend sein, fehlen" },
+    { word: "ACCEDERE", translation: "herbeikommen, hingehen, sich nähern" },
+    { word: "ALTUS", translation: "hoch, tief" },
+    { word: "AMOR", translation: "die Liebe" },
+    { word: "AN", translation: "oder (etwa)" },
+    { word: "AUXILIUM", translation: "die Hilfe" },
+    { word: "CONVENIRE", translation: "zusammenkommen; zusammempassen; (m. Akk.) treffen" },
+    { word: "EMERE", translation: "kaufen" },
+    { word: "ERIPERE", translation: "entreissen" },
+    { word: "FUGERE", translation: "fliehen (vor), entfliehen, meiden" },
+    { word: "IGITUR", translation: "also, folglich" },
+    { word: "LABOR", translation: "die Arbeit, die Mühe, die Anstrengung" },
+    { word: "LIBERTAS", translation: "die Freiheit" },
+    { word: "PERICULUM", translation: "die Gefahr" },
+    { word: "POSSE", translation: "können" },
+    { word: "PULCHER", translation: "schön" },
+    { word: "QUAERERE", translation: "fragen; suchen; erwerben wollen" },
+    { word: "SAEPE", translation: "oft" },
+    { word: "SI", translation: "wenn; falls" },
+    { word: "SIMUL", translation: "gleichzeitig, zugleich" },
+    { word: "SOLUS", translation: "allein, einzig" },
+    { word: "STUDIUM", translation: "die Beschäftigung; das Engagement, das Interesse" },
+    { word: "ALIUS", translation: "ein anderer" },
+    { word: "ARMA", translation: "die Waffen; das Gerät" },
+    { word: "CUM", translation: "als (plötzlich), (zu der Zeit) als, (immer) wenn" },
+    { word: "DEINDE", translation: "dann, darauf" },
+    { word: "FACERE", translation: "machen, tun, handeln" },
+    { word: "MALUS", translation: "schlecht, schlimm, böse" },
+    { word: "NIHIL", translation: "nichts" },
+    { word: "NISI", translation: "wenn nicht" },
+    { word: "NOBIS", translation: "uns, für uns" },
+    { word: "PAUCI", translation: "wenige" },
+    { word: "PAX", translation: "der Frieden" },
+    { word: "POSTQUAM", translation: "nachdem, als" },
+    { word: "PUGNARE", translation: "kämpfen" },
+    { word: "PUTARE", translation: "glauben, meinen; (m. doppeltem Akk.) halten für" },
+    { word: "QUAMQUAM", translation: "obwohl" },
+    { word: "QUIA", translation: "weil" },
+    { word: "SECUM", translation: "mit sich, bei sich" },
+    { word: "UNUS", translation: "einer, ein einziger" },
+    { word: "VOS", translation: "ihr (Nom.); euch (Akk.)" },
+    { word: "VOX", translation: "die Stimme, die Äußerung, der Laut" },
+    { word: "ACCIDERE", translation: "geschehen, sich ereignen" },
+    { word: "ALIUSALIUS", translation: "der eine ... der andere" },
+    { word: "CONTENDERE", translation: "eilen; sich anstrengen; kämpfen; behaupten" },
+    { word: "DISCEDERE", translation: "weggehen, auseinandergehen" },
+    { word: "ERGO", translation: "also, deshalb" },
+    { word: "HOMO", translation: "der Mensch" },
+    { word: "INDE", translation: "von dort; darauf; deshalb" },
+    { word: "MANERE", translation: "bleiben; warten (auf)" },
+    { word: "MATER", translation: "die Mutter" },
+    { word: "MONS", translation: "der Berg" },
+    { word: "MORS", translation: "der Tod" },
+    { word: "MULTITUDO", translation: "die Menge, die große Zahl" },
+    { word: "NOBISCUM", translation: "mit uns" },
+    { word: "NOS", translation: "wir (Nom.); uns (Akk.)" },
+    { word: "OPS", translation: "die Hilfe; die Kraft; (Pl.) die Macht, die Mittel, der Reichtum" },
+    { word: "PARENS", translation: "der Vater; die Mutter; (Pl.) die Eltern" },
+    { word: "PARS", translation: "der Teil, die Seite" },
+    { word: "PATER", translation: "der Vater" },
+    { word: "RELINQUERE", translation: "verlassen, zurücklassen" },
+    { word: "RURSUS", translation: "wieder" },
+    { word: "URBS", translation: "die Stadt" },
+    { word: "VINCERE", translation: "siegen, besiegen, übertreffen" },
+    { word: "VOBIS", translation: "euch, für euch" },
+    { word: "AGER", translation: "der Acker, das Feld, das Gebiet" },
+    { word: "ANNUS", translation: "das Jahr" },
+    { word: "ANTE", translation: "vorher" },
+    { word: "CAUSA", translation: "die Sache; der Grund; der Prozess" },
+    { word: "CIVITAS", translation: "die Gemeinde, der Staat" },
+    { word: "COMMITTERE", translation: "anvertrauen; begehen; veranstalten" },
+    { word: "CONSISTERE", translation: "stehen bleiben, sich aufstellen" },
+    { word: "CREDERE", translation: "glauben; anvertrauen" },
+    { word: "DOLOR", translation: "der Schmerz" },
+    { word: "FACTUM", translation: "die Handlung, die Tat, die Tatsache" },
+    { word: "FILIA", translation: "die Tochter" },
+    { word: "FILIUS", translation: "der Sohn" },
+    { word: "FRATER", translation: "der Bruder" },
+    { word: "HIC", translation: "hier" },
+    { word: "IMPERARE", translation: "befehlen, herrschen (über)" },
+    { word: "INSIDIAE", translation: "die Falle, das Attentat, die Hinterlist" },
+    { word: "INTERFICERE", translation: "töten, vernichten" },
+    { word: "IS", translation: "dieser, diese, dieses; er, sie, es; (Gen.) sein, ihr" },
+    { word: "IUBERE", translation: "befehlen, beauftragen" },
+    { word: "LOCUS", translation: "der Ort, der Platz, die Stelle" },
+    { word: "MITTERE", translation: "schicken, werfen" },
+    { word: "NEMO", translation: "niemand" },
+    { word: "NOSTER", translation: "unser" },
+    { word: "NOVUS", translation: "neu, ungewöhnlich" },
+    { word: "NOX", translation: "die Nacht" },
+    { word: "PLERIQUE", translation: "die meisten, sehr viele" },
+    { word: "PRAETEREA", translation: "außerdem" },
+    { word: "PRO", translation: "vor; anstelle von; für" },
+    { word: "QUONIAM", translation: "da ja, weil ja" },
+    { word: "REX", translation: "der König" },
+    { word: "AGERE", translation: "handeln, treiben, verhandeln" },
+    { word: "AMPLUS", translation: "bedeutend, groß, weit" },
+    { word: "AQUA", translation: "das Wasser" },
+    { word: "CASTRA", translation: "das Lager" },
+    { word: "CLARUS", translation: "hell, klar, berühmt" },
+    { word: "CONTRA", translation: "gegen" },
+    { word: "CURA", translation: "die Sorge; die Sorgfalt" },
+    { word: "DEFENDERE", translation: "abwehren; verteidigen (vor/gegen)" },
+    { word: "EXEMPLUM", translation: "das Beispiel, das Vorbild" },
+    { word: "FINIS", translation: "das Ende; die Grenze; das Ziel, der Zweck; (Pl.) das Gebiet" },
+    { word: "HOSTIS", translation: "der Feind, der Landesfeind" },
+    { word: "INQUAM", translation: "sage ich, sagte ich" },
+    { word: "LACRIMA", translation: "die Träne" },
+    { word: "LEX", translation: "das Gesetz; die Bedingung" },
+    { word: "LUX", translation: "das Licht, das Tageslicht" },
+    { word: "MALUM", translation: "das Leid, das Übel, das Unglück" },
+    { word: "MILES", translation: "der Soldat" },
+    { word: "NUMERUS", translation: "die Zahl, die Menge" },
+    { word: "OBSES", translation: "die Geisel" },
+    { word: "PATRIA", translation: "die Heimat" },
+    { word: "PERVENIRE", translation: "kommen zu/nach" },
+    { word: "PONERE", translation: "(auf)stellen, (hin)legen, setzen" },
+    { word: "PRAESIDIUM", translation: "der Schutz; die Hilfe; der Wachposten; die Schutztruppe" },
+    { word: "PREMERE", translation: "drücken; unterdrücken, bedrängen" },
+    { word: "PRIMUM", translation: "erstens, zuerst, zum ersten Mal" },
+    { word: "PRIMUS", translation: "der erste" },
+    { word: "QUI", translation: "der, die, das; welcher, welche, welches; (am Satzanfang:) dieser, diese, dieses; (ohne Bw:) wer, was" },
+    { word: "SERVARE", translation: "retten, bewahren; beobachten" },
+    { word: "SUMMUS", translation: "der höchste, oberste, letzte" },
+    { word: "SUUS", translation: "sein, ihr" },
+    { word: "TELUM", translation: "die Waffe, das Geschoss" },
+    { word: "TUTUS", translation: "sicher" },
+    { word: "ULLUS", translation: "irgendeiner, irgendeine, irgendein" },
+    { word: "VESTER", translation: "euer" },
+    { word: "VICTOR", translation: "der Sieger, (adj.) siegreich" },
+    { word: "VIRGO", translation: "das Mädchen, die junge Frau" },
+    { word: "VIRTUS", translation: "die Tapferkeit, die Tüchtigkeit, die Vortrefflichkeit; die Leistung" },
+    { word: "ABIRE", translation: "weggehen" },
+    { word: "ADDUCERE", translation: "heranführen, veranlassen, beeinflussen" },
+    { word: "ADIRE", translation: "herantreten (an), hingehen (zu), aufsuchen; auf sich nehmen; angreifen" },
+    { word: "BELLUM", translation: "der Krieg" },
+    { word: "CELER", translation: "schnell" },
+    { word: "CIVIS", translation: "der Bürger" },
+    { word: "COMMUNIS", translation: "gemeinsam, allgemein" },
+    { word: "EXISTIMARE", translation: "meinen; schätzen" },
+    { word: "FACILIS", translation: "leicht (zu tun)" },
+    { word: "FORTIS", translation: "kräftig; tapfer" },
+    { word: "GERERE", translation: "führen, ausführen; tragen" },
+    { word: "GRAVIS", translation: "schwer" },
+    { word: "HAUD", translation: "nicht" },
+    { word: "HINC", translation: "von hier; hierauf" },
+    { word: "IMPERATOR", translation: "der Feldherr; der Kaiser" },
+    { word: "INGENS", translation: "gewaltig, riesig, ungeheuer" },
+    { word: "IRE", translation: "gehen" },
+    { word: "LEGIO", translation: "die Legion" },
+    { word: "NOSCERE", translation: "erkennen, kennenlernen" },
+    { word: "NUMQUAM", translation: "nie, niemals" },
+    { word: "OMNIS", translation: "jeder, ganz; (Pl.) alle" },
+    { word: "PAR", translation: "gleich, ebenbürtig" },
+    { word: "PERIRE", translation: "umkommen, zugrunde gehen" },
+    { word: "PLACET", translation: "es gefällt jmdm., jmd. beschließt" },
+    { word: "PLURIMI", translation: "die meisten, sehr viele" },
+    { word: "POTESTAS", translation: "die Macht, die Gewalt, die Amtsgewalt" },
+    { word: "PROELIUM", translation: "der Kampf, die Schlacht" },
+    { word: "RATIO", translation: "der Grund; die Vernunft; die Überlegung; die Art und Weise" },
+    { word: "REDIRE", translation: "zurückgehen, zurückkehren" },
+    { word: "RELIGUUS", translation: "übrig; künftig" },
+    { word: "SALUS", translation: "die Gesundheit; die Rettung; das Glück; der Gruß" },
+    { word: "SE", translation: "sich" },
+    { word: "SIBI", translation: "sich, für sich" },
+    { word: "SIMILIS", translation: "ähnlich" },
+    { word: "VIS", translation: "die Kraft, die Gewalt; die Menge; (Pl.) die Kräfte, die Streitkräfte" },
+    { word: "AEDIS", translation: "der Tempel; (Pl.) das Haus" },
+    { word: "AUCTORITAS", translation: "das Ansehen, der Einfluss, die Macht" },
+    { word: "CERTUS", translation: "sicher" },
+    { word: "DIES", translation: "der Tag" },
+    { word: "FIDES", translation: "der Glaube; die Treue; das Vertrauen; die Zuverlässigkeit" },
+    { word: "HONOR/HONOS", translation: "die Ehre; das Ehrenamt" },
+    { word: "IGNIS", translation: "das Feuer" },
+    { word: "INTELLEGERE", translation: "merken, bemerken, verstehen, begreifen" },
+    { word: "INVIDIA", translation: "der Neid; der Hass" },
+    { word: "LICET", translation: "es ist erlaubt, es ist möglich" },
+    { word: "MAGNITUDO", translation: "die Größe" },
+    { word: "MENS", translation: "der Geist, der Sinn, der Verstand; die Meinung" },
+    { word: "NEQUENEQUE", translation: "weder … noch" },
+    { word: "REGIO", translation: "das Gebiet, die Gegend; die Richtung" },
+    { word: "RES", translation: "die Sache, das Ding, die Angelegenheit" },
+    { word: "RESPUBLICA", translation: "der Staat" },
+    { word: "SIGNUM", translation: "das Zeichen; das Merkmal; der Beweis" },
+    { word: "SOL", translation: "die Sonne" },
+    { word: "SPES", translation: "die Hoffnung, die Erwartung" },
+    { word: "TAM", translation: "so" },
+    { word: "TANTUM", translation: "nur" },
+    { word: "TRADERE", translation: "übergeben, ausliefern" },
+    { word: "TRAHERE", translation: "ziehen, schleppen" },
+    { word: "TUUS", translation: "dein" },
+    { word: "UBI", translation: "sobald" },
+    { word: "VERO", translation: "aber, in der Tat, wirklich" },
+    { word: "VERUS", translation: "echt, richtig, wahr" },
+    { word: "AC/ATQUE", translation: "und, und auch; (im Vergleich) wie, als" },
+    { word: "AETAS", translation: "die Zeit, das Zeitalter, die Lebenszeit" },
+    { word: "AMITTERE", translation: "verlieren" },
+    { word: "CLASSIS", translation: "die Flotte; die Abteilung" },
+    { word: "DUX", translation: "der Anführer, die Anführerin" },
+    { word: "FATUM", translation: "das Schicksal; der Götterspruch" },
+    { word: "GENS", translation: "der Stamm; die Familie; das Volk" },
+    { word: "GENUS", translation: "das Geschlecht; die Art; die Abstammung" },
+    { word: "ITER", translation: "die Reise, der Weg, der Marsch" },
+    { word: "LITUS", translation: "die Küste, der Strand" },
+    { word: "LONGUS", translation: "lang, weit" },
+    { word: "NAVIS", translation: "das Schiff" },
+    { word: "NOMEN", translation: "der Name" },
+    { word: "OFFICIUM", translation: "der Dienst; die Pflicht; das Pflichtgefühl" },
+    { word: "OPUS", translation: "das Werk; die Arbeit; die Tat" },
+    { word: "ORBIS", translation: "der Kreis(lauf); der Erdkreis, die Welt" },
+    { word: "PRÎNCEPS", translation: "der erste Mann, der führende Mann; der Kaiser" },
+    { word: "QUO", translation: "wohin?" },
+    { word: "QUOD", translation: "dass, weil" },
+    { word: "SCELUS", translation: "das Verbrechen" },
+    { word: "SIC", translation: "so" },
+    { word: "TEMPUS", translation: "die Zeit; die günstige Zeit; die Umstände" },
+    { word: "UXOR", translation: "die Ehefrau, die Gattin" },
+    { word: "VENTUS", translation: "der Wind" },
+    { word: "CORPUS", translation: "der Körper; der Leichnam" },
+    { word: "DUO", translation: "zwei" },
+    { word: "EO", translation: "dorthin; deswegen" },
+    { word: "FLUMEN", translation: "der Fluss" },
+    { word: "LAUS", translation: "das Lob; der Ruhm" },
+    { word: "MARE", translation: "das Meer" },
+    { word: "MULIER", translation: "die Frau" },
+    { word: "MUNUS", translation: "die Aufgabe; das Geschenk" },
+    { word: "NOBILIS", translation: "adlig, vornehm; berühmt" },
+    { word: "PECTUS", translation: "die Brust; das Herz" },
+    { word: "RECIPERE", translation: "aufnehmen; wiederbekommen, zurücknehmen" },
+    { word: "REDDERE", translation: "zurückgeben, geben; (m. doppeltem Akk.) jmdn. zu etw. machen" },
+    { word: "TALIS", translation: "derartig, ein solcher, so (beschaffen)" },
+    { word: "UT", translation: "sobald; sooft" },
+    { word: "ALIENUS", translation: "fremd" },
+    { word: "AUFERRE", translation: "wegbringen, rauben" },
+    { word: "CASUS", translation: "der Fall; der Zufall" },
+    { word: "COMPLURES", translation: "mehrere" },
+    { word: "CONFERRE", translation: "zusammentragen; vergleichen" },
+    { word: "CONSUL", translation: "der Konsul" },
+    { word: "DIGNUS", translation: "würdig, wert (einer Sache)" },
+    { word: "EXERCITUS", translation: "das Heer" },
+    { word: "FACINUS", translation: "die Handlung, die Untat" },
+    { word: "FERRE", translation: "bringen, tragen; ertragen" },
+    { word: "INFERRE", translation: "hineintragen, zufügen" },
+    { word: "INGENIUM", translation: "die Begabung, das Talent; der Verstand" },
+    { word: "MALE", translation: "schlecht, schlimm" },
+    { word: "METUS", translation: "die Angst, die Furcht" },
+    { word: "MOS", translation: "der Brauch, die Sitte; (Pl.) der Charakter" },
+    { word: "NEC", translation: "und nicht, auch nicht" },
+    { word: "REFERRE", translation: "(zurück)bringen; berichten" },
+    { word: "REGNUM", translation: "die Herrschaft, die Königsherrschaft; das Reich" },
+    { word: "SENATUS", translation: "der Senat, die Senatsversammlung" },
+    { word: "STATUERE", translation: "aufstellen; beschließen, festsetzen" },
+    { word: "USUS", translation: "der Nutzen, die Benutzung, die Ausübung" },
+    { word: "DOMUS", translation: "das Haus" },
+    { word: "HIC", translation: "dieser, diese, dieses (hier); folgender" },
+    { word: "ILLE", translation: "jener, jene, jenes; der, die, das (dort); damalig, berühmt" },
+    { word: "LITTERAE", translation: "der Brief; die Literatur; die Wissenschaften; (Sg.) der Buchstabe" },
+    { word: "PES", translation: "der Fuß" },
+    { word: "PUBLICUS", translation: "öffentlich, staatlich" },
+    { word: "UT", translation: "wie" },
+    { word: "ACIES", translation: "die Schärfe; die Schlacht; das Heer" },
+    { word: "BARBARUS", translation: "ausländisch, unzivilisiert; (Subst.) der Barbar" },
+    { word: "CRIMEN", translation: "das Verbrechen; der Vorwurf" },
+    { word: "IDEM", translation: "derselbe; der gleiche" },
+    { word: "ISTE", translation: "dieser, diese, dieses (da)" },
+    { word: "NIHIL NISI", translation: "nichts als, nur" },
+    { word: "OPORTET", translation: "es gehört sich, es ist nötig" },
+    { word: "RELIGIO", translation: "der Glaube, die (Gottes-)Verehrung, die Frömmigkeit; die Gewissenhaftigkeit" },
+    { word: "VETUS", translation: "alt" },
+    { word: "CUM", translation: "als, nachdem; weil; obwohl; während (dagegen)" },
+    { word: "ITEM", translation: "ebenso, gleichfalls" },
+    { word: "IUDICARE", translation: "urteilen, beurteilen" },
+    { word: "IUS", translation: "das Recht" },
+    { word: "NUNTIARE", translation: "melden" },
+    { word: "OCCUPARE", translation: "besetzen, einnehmen" },
+    { word: "PROVINCIA", translation: "die Provinz" },
+    { word: "SUPPLICIUM", translation: "die Hinrichtung; die Strafe; das flehentliche Bitten" },
+    { word: "ADEO", translation: "so sehr" },
+    { word: "CAPUT", translation: "der Kopf; die Hauptstadt" },
+    { word: "ISTIC", translation: "da, dort" },
+    { word: "MANUS", translation: "die Hand, die Schar (von Bewaffneten)" },
+    { word: "NE", translation: "dass nicht; damit nicht; (nach Ausdrücken des Fürchtens) dass" },
+    { word: "SOLVERE", translation: "lösen, auflösen; bezahlen" },
+    { word: "SUMERE", translation: "nehmen" },
+    { word: "UT", translation: "dass; sodass; damit, um ... zu" }
+];
 
         // Spielvariablen
         let selectedWordObj = null;
-        let lastWord = "";
         let guessedLetters = [];
         let timeElapsed = 0;
         let timerInterval;
@@ -219,7 +715,8 @@
         let losses = 0;
         let recognition;
         let isListening = false;
-        let recognitionActive = false;
+        let displayMode = "1"; // Standard: Einzelne Teile
+        let wordLengthPref = "any"; // Standard: Beliebige Länge
 
         // DOM-Elemente
         const hangmanSvg = document.getElementById("hangman-svg");
@@ -233,6 +730,11 @@
         const voiceStatus = document.getElementById("voice-status");
         const winsSpan = document.getElementById("wins");
         const lossesSpan = document.getElementById("losses");
+        const settingsPanel = document.getElementById("settings-panel");
+        const settingsButton = document.getElementById("settings-button");
+        const saveSettingsButton = document.getElementById("save-settings");
+        const displayModeSelect = document.getElementById("display-mode");
+        const wordLengthSelect = document.getElementById("word-length");
 
         // Galgen-Teile
         const hangmanParts = [
@@ -265,24 +767,38 @@
             
             messageDiv.textContent = "";
             translationDiv.textContent = "";
-            timerDiv.textContent = `Verstrichene Zeit: ${timeElapsed}s`;
+            timerDiv.textContent = "Verstrichene Zeit: 0s";
             
             resetHangman();
             stopVoiceRecognition();
-            
-            // Fokus auf den ersten Button setzen für bessere Tastaturnavigation
-            const firstButton = document.querySelector(".letter-button");
-            if (firstButton) firstButton.focus();
         }
 
-        // Zufälliges Wort auswählen
+        // Zufälliges Wort auswählen nach Längenpräferenz
         function getRandomWord() {
-            let newWordObj;
-            do {
-                newWordObj = words[Math.floor(Math.random() * words.length)];
-            } while (newWordObj.word === lastWord && words.length > 1);
-            lastWord = newWordObj.word;
-            return newWordObj;
+            let filteredWords = words;
+            
+            // Filter nach Wortlänge
+            if (wordLengthPref !== "any") {
+                filteredWords = words.filter(wordObj => {
+                    const length = wordObj.word.length;
+                    if (wordLengthPref === "short") return length >= 3 && length <= 5;
+                    if (wordLengthPref === "medium") return length >= 6 && length <= 8;
+                    if (wordLengthPref === "long") return length >= 9;
+                    return true;
+                });
+            }
+            
+            // Vermeide Wiederholung des letzten Worts
+            const availableWords = filteredWords.filter(wordObj => 
+                !selectedWordObj || wordObj.word !== selectedWordObj.word
+            );
+            
+            // Falls keine Wörter übrig, nimm alle
+            if (availableWords.length === 0) {
+                return filteredWords[Math.floor(Math.random() * filteredWords.length)];
+            }
+            
+            return availableWords[Math.floor(Math.random() * availableWords.length)];
         }
 
         // Wortanzeige aktualisieren
@@ -302,58 +818,69 @@
                 const button = document.createElement("button");
                 button.textContent = letter;
                 button.classList.add("letter-button");
-                button.dataset.letter = letter;
                 
-                // Click-Event
-                button.addEventListener("click", () => guessLetter(letter, button));
-                
-                // Tastatur-Fokus
-                button.addEventListener("keydown", (e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                        guessLetter(letter, button);
-                    }
-                });
-                
-                if (gameEnded || guessedLetters.includes(letter)) {
+                if (guessedLetters.includes(letter)) {
                     button.disabled = true;
-                    if (!selectedWordObj.word.includes(letter)) {
+                    if (selectedWordObj.word.includes(letter)) {
+                        button.classList.add("correct");
+                    } else {
                         button.classList.add("wrong");
                     }
                 }
                 
+                button.addEventListener("click", () => guessLetter(letter));
                 lettersDiv.appendChild(button);
             }
         }
 
         // Buchstaben raten
-        function guessLetter(letter, button) {
-            if (!guessedLetters.includes(letter) && !gameEnded) {
-                guessedLetters.push(letter);
-                
-                // Button-Status aktualisieren
-                const allButtons = document.querySelectorAll(".letter-button");
-                allButtons.forEach(btn => {
-                    if (btn.dataset.letter === letter) {
+        function guessLetter(letter) {
+            if (guessedLetters.includes(letter) || gameEnded) return;
+            
+            guessedLetters.push(letter);
+            const buttons = document.querySelectorAll(".letter-button");
+            
+            if (!selectedWordObj.word.includes(letter)) {
+                mistakes++;
+                buttons.forEach(btn => {
+                    if (btn.textContent === letter) {
+                        btn.classList.add("wrong");
                         btn.disabled = true;
-                        if (!selectedWordObj.word.includes(letter)) {
-                            btn.classList.add("wrong");
-                            mistakes++;
-                            updateHangmanDisplay();
-                        } else {
-                            btn.classList.add("active");
-                        }
                     }
                 });
-                
-                updateWordDisplay();
-                checkGameStatus();
+                updateHangmanDisplay();
+            } else {
+                buttons.forEach(btn => {
+                    if (btn.textContent === letter) {
+                        btn.classList.add("correct");
+                        btn.disabled = true;
+                    }
+                });
             }
+            
+            updateWordDisplay();
+            checkGameStatus();
         }
 
-        // Galgen aktualisieren
+        // Galgen aktualisieren (mit Anzeigemodus)
         function updateHangmanDisplay() {
-            if (mistakes > 0 && mistakes <= hangmanParts.length) {
-                hangmanParts[mistakes - 1].draw(hangmanSvg);
+            if (mistakes <= 0) return;
+            
+            resetHangman();
+            
+            if (displayMode === "all") {
+                // Alle Teile anzeigen (einfacher Modus)
+                hangmanParts.forEach(part => part.draw(hangmanSvg));
+            } else {
+                const mode = parseInt(displayMode);
+                const partsToShow = Math.min(mistakes * mode, hangmanParts.length);
+                
+                // Teile entsprechend dem Anzeigemodus zeigen
+                for (let i = 0; i < partsToShow; i++) {
+                    if (i < hangmanParts.length) {
+                        hangmanParts[i].draw(hangmanSvg);
+                    }
+                }
             }
         }
 
@@ -365,47 +892,20 @@
         // Spielstatus prüfen
         function checkGameStatus() {
             if (selectedWordObj.word.split("").every(letter => guessedLetters.includes(letter))) {
-                // Gewonnen
                 messageDiv.textContent = "Gewonnen!";
                 translationDiv.textContent = `Deutsche Bedeutung: ${selectedWordObj.translation}`;
                 wins++;
                 winsSpan.textContent = wins;
                 gameEnded = true;
                 clearInterval(timerInterval);
-                disableLetterButtons();
-                stopVoiceRecognition();
-            } else if (mistakes >= hangmanParts.length) {
-                // Verloren
+            } else if (displayMode === "all" ? mistakes > 0 : mistakes >= hangmanParts.length) {
                 messageDiv.textContent = `Verloren! Das Wort war: ${selectedWordObj.word}`;
                 translationDiv.textContent = `Deutsche Bedeutung: ${selectedWordObj.translation}`;
                 losses++;
                 lossesSpan.textContent = losses;
                 gameEnded = true;
                 clearInterval(timerInterval);
-                disableLetterButtons();
-                stopVoiceRecognition();
-                
-                // Alle Buchstaben anzeigen
-                const missingLetters = selectedWordObj.word.split("")
-                    .filter(letter => !guessedLetters.includes(letter));
-                
-                missingLetters.forEach(letter => {
-                    const buttons = document.querySelectorAll(".letter-button");
-                    buttons.forEach(btn => {
-                        if (btn.dataset.letter === letter) {
-                            btn.classList.add("wrong");
-                        }
-                    });
-                });
             }
-        }
-
-        // Alle Buchstaben-Buttons deaktivieren
-        function disableLetterButtons() {
-            const buttons = document.querySelectorAll(".letter-button");
-            buttons.forEach(button => {
-                button.disabled = true;
-            });
         }
 
         // Timer aktualisieren
@@ -452,58 +952,54 @@
             recognition.continuous = true;
             recognition.interimResults = false;
             recognition.lang = "de-DE";
+            recognition.maxAlternatives = 3;
 
             recognition.onstart = () => {
                 isListening = true;
-                recognitionActive = true;
-                voiceStatus.textContent = "Spracherkennung: Aktiv (Buchstaben sprechen)";
                 voiceButton.classList.add("listening");
+                voiceStatus.textContent = "Spracherkennung: Aktiv (Buchstaben oder Wörter sprechen)";
             };
 
             recognition.onend = () => {
-                if (recognitionActive) {
-                    recognition.start(); // Automatisch neu starten
-                } else {
-                    isListening = false;
-                    voiceStatus.textContent = "Spracherkennung: Inaktiv";
-                    voiceButton.classList.remove("listening");
+                if (isListening) {
+                    recognition.start();
                 }
             };
 
             recognition.onresult = (event) => {
                 const transcript = event.results[event.results.length - 1][0].transcript;
-                const spokenText = transcript.trim().toUpperCase();
-                
-                // Jeden Buchstaben im erkannten Text verarbeiten
-                for (const char of spokenText) {
-                    if (/^[A-ZÄÖÜ]$/.test(char)) {
-                        processSpokenLetter(char);
-                    }
-                }
+                processSpokenInput(transcript);
             };
 
             recognition.onerror = (event) => {
                 console.error("Spracherkennungsfehler:", event.error);
-                if (event.error === 'not-allowed') {
-                    voiceStatus.textContent = "Mikrofon-Zugriff wurde blockiert";
-                } else {
-                    voiceStatus.textContent = `Fehler: ${event.error}`;
-                }
-                voiceButton.classList.remove("listening");
-                recognitionActive = false;
+                voiceStatus.textContent = `Fehler: ${event.error}`;
+                stopVoiceRecognition();
             };
 
             return true;
         }
 
-        function processSpokenLetter(letter) {
+        function processSpokenInput(input) {
             if (gameEnded) return;
             
+            const cleanInput = input.trim().toUpperCase().replace(/[^A-ZÄÖÜ]/g, '');
+            
+            for (const char of cleanInput) {
+                processSingleLetter(char);
+            }
+        }
+
+        function processSingleLetter(letter) {
             const buttons = document.querySelectorAll(".letter-button");
             for (const button of buttons) {
                 if (button.textContent === letter && !button.disabled) {
-                    button.focus();
-                    guessLetter(letter, button);
+                    setTimeout(() => {
+                        button.click();
+                        button.focus();
+                        button.style.transform = "scale(1.1)";
+                        setTimeout(() => button.style.transform = "", 200);
+                    }, 100);
                     break;
                 }
             }
@@ -511,7 +1007,10 @@
 
         function toggleVoiceRecognition() {
             if (!recognition) {
-                if (!initSpeechRecognition()) return;
+                if (!initSpeechRecognition()) {
+                    alert("Spracherkennung wird in diesem Browser nicht unterstützt!");
+                    return;
+                }
             }
 
             if (isListening) {
@@ -522,47 +1021,63 @@
         }
 
         function startVoiceRecognition() {
-            recognitionActive = true;
+            isListening = true;
             try {
                 recognition.start();
-                voiceStatus.textContent = "Spracherkennung wird gestartet...";
+                voiceStatus.textContent = "Spracherkennung startet...";
             } catch (e) {
-                console.error("Startfehler:", e);
+                console.error("Fehler beim Starten:", e);
                 voiceStatus.textContent = "Fehler beim Starten der Spracherkennung";
+                isListening = false;
             }
         }
 
         function stopVoiceRecognition() {
-            recognitionActive = false;
-            if (recognition) {
-                recognition.stop();
-            }
+            isListening = false;
+            voiceButton.classList.remove("listening");
+            voiceStatus.textContent = "Spracherkennung: Inaktiv";
+            recognition.stop();
         }
 
-        // Tastatur-Ereignisse
+        // Einstellungen
+        function toggleSettings() {
+            settingsPanel.style.display = settingsPanel.style.display === "block" ? "none" : "block";
+            // Aktuelle Einstellungen in Formular übernehmen
+            displayModeSelect.value = displayMode;
+            wordLengthSelect.value = wordLengthPref;
+        }
+
+        function saveSettings() {
+            displayMode = displayModeSelect.value;
+            wordLengthPref = wordLengthSelect.value;
+            settingsPanel.style.display = "none";
+            init(); // Neustart mit neuen Einstellungen
+        }
+
+        // Tastatursteuerung
         document.addEventListener("keydown", (e) => {
             if (gameEnded) return;
             
-            // Nur Buchstaben A-Z (Großbuchstaben)
-            if (e.keyCode >= 65 && e.keyCode <= 90) {
-                const letter = e.key.toUpperCase();
+            const key = e.key.toUpperCase();
+            if (/^[A-Z]$/.test(key)) {
                 const buttons = document.querySelectorAll(".letter-button");
-                
                 for (const button of buttons) {
-                    if (button.textContent === letter && !button.disabled) {
-                        guessLetter(letter, button);
+                    if (button.textContent === key && !button.disabled) {
+                        button.click();
                         break;
                     }
                 }
             }
         });
 
-        // Event-Listener für Buttons
+        // Event-Listener
         resetButton.addEventListener("click", init);
         voiceButton.addEventListener("click", toggleVoiceRecognition);
+        settingsButton.addEventListener("click", toggleSettings);
+        saveSettingsButton.addEventListener("click", saveSettings);
 
-        // Initialisierung beim Laden
-        document.addEventListener("DOMContentLoaded", init);
+        // Initialisierung
+        init();
     </script>
 </body>
 </html>
