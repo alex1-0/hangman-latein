@@ -655,16 +655,34 @@ function initSpeechRecognition() {
         }
     };
 
-    recognition.onerror = (event) => {
-        console.error("Spracherkennungsfehler:", event.error);
-        if (event.error === 'no-speech' || event.error === 'audio-capture') {
-            // Kein ernsthafter Fehler, einfach neu starten
+// Ersetzen Sie die onerror-Funktion im Spracherkennungscode durch:
+
+recognition.onerror = (event) => {
+    console.error("Spracherkennungsfehler:", event.error);
+    
+    switch(event.error) {
+        case 'network':
+            document.getElementById("voice-status").textContent = "Netzwerkfehler - Überprüfen Sie Ihre Internetverbindung";
+            // Automatischer Wiederherstellungsversuch nach 3 Sekunden
+            setTimeout(() => {
+                if (recognitionActive) {
+                    document.getElementById("voice-status").textContent = "Versuche erneut zu verbinden...";
+                    recognition.start();
+                }
+            }, 3000);
+            break;
+            
+        case 'no-speech':
+        case 'audio-capture':
+            // Kein ernsthafter Fehler, neu starten
             setTimeout(() => recognition.start(), 500);
-        } else {
+            break;
+            
+        default:
             document.getElementById("voice-status").textContent = `Fehler: ${event.error}`;
             recognitionActive = false;
-        }
-    };
+    }
+};
 
     return true;
 }
