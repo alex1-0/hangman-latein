@@ -440,16 +440,15 @@ const words = [
 ];
 
 
-
-let selectedWordObj = null; // Speichert das aktuelle Wort-Objekt
-let lastWord = ""; // Speichert das zuletzt verwendete Wort
+let selectedWordObj = null;
+let lastWord = "";
 let guessedLetters = [];
 let timeElapsed = 0;
 let timerInterval;
 let mistakes = 0;
-let gameEnded = false; // Neuer Zustand, um das Spielende zu verfolgen
-let wins = 0; // Counter für gewonnene Spiele
-let losses = 0; // Counter für verlorene Spiele
+let gameEnded = false;
+let wins = 0;
+let losses = 0;
 let recognition;
 let isListening = false;
 
@@ -460,45 +459,46 @@ const messageDiv = document.getElementById("message");
 const translationDiv = document.getElementById("translation");
 const timerDiv = document.getElementById("timer");
 const resetButton = document.getElementById("reset-button");
-const winsSpan = document.getElementById("wins"); // Counter für gewonnene Spiele
-const lossesSpan = document.getElementById("losses"); // Counter für verlorene Spiele
+const winsSpan = document.getElementById("wins");
+const lossesSpan = document.getElementById("losses");
 
 const hangmanParts = [
-    { id: "gallows", draw: (svg) => drawLine(svg, 50, 220, 150, 220) }, // Galgenbasis
-    { id: "pole", draw: (svg) => drawLine(svg, 100, 220, 100, 50) },   // Galgenstange
-    { id: "beam", draw: (svg) => drawLine(svg, 100, 50, 150, 50) },    // Galgenbalken
-    { id: "rope", draw: (svg) => drawLine(svg, 150, 50, 150, 70) },   // Seil
-    { id: "head", draw: (svg) => drawCircle(svg, 150, 90, 20) },       // Kopf
-    { id: "body", draw: (svg) => drawLine(svg, 150, 110, 150, 170) }, // Körper
-    { id: "left-arm", draw: (svg) => drawLine(svg, 150, 130, 120, 150) }, // Linker Arm
-    { id: "right-arm", draw: (svg) => drawLine(svg, 150, 130, 180, 150) }, // Rechter Arm
-    { id: "left-leg", draw: (svg) => drawLine(svg, 150, 170, 120, 200) },  // Linkes Bein
-    { id: "right-leg", draw: (svg) => drawLine(svg, 150, 170, 180, 200) }  // Rechtes Bein
+    { id: "gallows", draw: (svg) => drawLine(svg, 50, 220, 150, 220) },
+    { id: "pole", draw: (svg) => drawLine(svg, 100, 220, 100, 50) },
+    { id: "beam", draw: (svg) => drawLine(svg, 100, 50, 150, 50) },
+    { id: "rope", draw: (svg) => drawLine(svg, 150, 50, 150, 70) },
+    { id: "head", draw: (svg) => drawCircle(svg, 150, 90, 20) },
+    { id: "body", draw: (svg) => drawLine(svg, 150, 110, 150, 170) },
+    { id: "left-arm", draw: (svg) => drawLine(svg, 150, 130, 120, 150) },
+    { id: "right-arm", draw: (svg) => drawLine(svg, 150, 130, 180, 150) },
+    { id: "left-leg", draw: (svg) => drawLine(svg, 150, 170, 120, 200) },
+    { id: "right-leg", draw: (svg) => drawLine(svg, 150, 170, 180, 200) }
 ];
 
 function init() {
-    selectedWordObj = getRandomWord(); // Zufälliges Wort-Objekt auswählen
+    selectedWordObj = getRandomWord();
     guessedLetters = [];
     mistakes = 0;
     timeElapsed = 0;
-    gameEnded = false; // Spielzustand zurücksetzen
+    gameEnded = false;
     clearInterval(timerInterval);
     timerInterval = setInterval(updateTimer, 1000);
     updateWordDisplay();
     createLetterButtons();
     updateHangmanDisplay();
     messageDiv.textContent = "";
-    translationDiv.textContent = ""; // Deutsche Bedeutung zurücksetzen
+    translationDiv.textContent = "";
     timerDiv.textContent = `Verstrichene Zeit: ${timeElapsed}s`;
     resetHangman();
+    stopVoiceRecognition();
 }
 
 function getRandomWord() {
     let newWordObj;
     do {
         newWordObj = words[Math.floor(Math.random() * words.length)];
-    } while (newWordObj.word === lastWord); // Wiederhole, bis ein anderes Wort ausgewählt wird
-    lastWord = newWordObj.word; // Speichere das neue Wort als zuletzt verwendet
+    } while (newWordObj.word === lastWord);
+    lastWord = newWordObj.word;
     return newWordObj;
 }
 
@@ -518,7 +518,7 @@ function createLetterButtons() {
         button.classList.add("letter-button");
         button.addEventListener("click", () => guessLetter(letter, button));
         if (gameEnded || guessedLetters.includes(letter)) {
-            button.disabled = true; // Buttons deaktivieren, wenn das Spiel beendet ist oder der Buchstabe bereits geraten wurde
+            button.disabled = true;
         }
         lettersDiv.appendChild(button);
     }
@@ -527,7 +527,7 @@ function createLetterButtons() {
 function guessLetter(letter, button) {
     if (!guessedLetters.includes(letter) && !gameEnded) {
         guessedLetters.push(letter);
-        button.disabled = true; // Deaktiviere den Button nach dem Klicken
+        if (button) button.disabled = true;
         if (!selectedWordObj.word.includes(letter)) {
             mistakes++;
             updateHangmanDisplay();
@@ -544,24 +544,24 @@ function updateHangmanDisplay() {
 }
 
 function resetHangman() {
-    hangmanSvg.innerHTML = ""; // SVG leeren
+    hangmanSvg.innerHTML = "";
 }
 
 function checkGameStatus() {
     if (selectedWordObj.word.split("").every(letter => guessedLetters.includes(letter))) {
         messageDiv.textContent = "Gewonnen!";
-        translationDiv.textContent = `Deutsche Bedeutung: ${selectedWordObj.translation}`; // Deutsche Bedeutung anzeigen
-        wins++; // Gewonnen-Counter erhöhen
-        winsSpan.textContent = wins; // Gewonnen-Counter aktualisieren
-        gameEnded = true; // Spiel beenden
+        translationDiv.textContent = `Deutsche Bedeutung: ${selectedWordObj.translation}`;
+        wins++;
+        winsSpan.textContent = wins;
+        gameEnded = true;
         clearInterval(timerInterval);
         disableLetterButtons();
     } else if (mistakes >= hangmanParts.length) {
         messageDiv.textContent = `Verloren! Das Wort war: ${selectedWordObj.word}`;
-        translationDiv.textContent = `Deutsche Bedeutung: ${selectedWordObj.translation}`; // Deutsche Bedeutung anzeigen
-        losses++; // Verloren-Counter erhöhen
-        lossesSpan.textContent = losses; // Verloren-Counter aktualisieren
-        gameEnded = true; // Spiel beenden
+        translationDiv.textContent = `Deutsche Bedeutung: ${selectedWordObj.translation}`;
+        losses++;
+        lossesSpan.textContent = losses;
+        gameEnded = true;
         clearInterval(timerInterval);
         disableLetterButtons();
     }
@@ -570,7 +570,7 @@ function checkGameStatus() {
 function disableLetterButtons() {
     const buttons = document.querySelectorAll(".letter-button");
     buttons.forEach(button => {
-        button.disabled = true; // Alle Buttons deaktivieren
+        button.disabled = true;
     });
 }
 
@@ -603,6 +603,7 @@ function drawCircle(svg, cx, cy, r) {
     svg.appendChild(circle);
 }
 
+// Spracherkennungsfunktionen
 function initSpeechRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     
@@ -612,42 +613,28 @@ function initSpeechRecognition() {
     }
 
     recognition = new SpeechRecognition();
-    recognition.continuous = true; // Wichtig: kontinuierliche Erkennung
+    recognition.continuous = true;
     recognition.interimResults = false;
     recognition.lang = "de-DE";
 
     recognition.onstart = () => {
         isListening = true;
-        document.getElementById("voice-status").textContent = "Spracherkennung: Aktiv (sprich Buchstaben)";
-        console.log("Spracherkennung aktiv");
+        document.getElementById("voice-status").textContent = "Spracherkennung: Aktiv (Buchstaben sprechen)";
     };
 
     recognition.onend = () => {
         isListening = false;
         document.getElementById("voice-status").textContent = "Spracherkennung: Inaktiv";
-        console.log("Spracherkennung beendet");
     };
 
     recognition.onresult = (event) => {
         const transcript = event.results[event.results.length - 1][0].transcript;
-        const spokenLetter = transcript.trim().toUpperCase();
-        console.log("Erkannt:", spokenLetter);
-
-        // Bessere Buchstabenerkennung
-        const letter = spokenLetter.length === 1 ? spokenLetter : 
-                       spokenLetter.includes("A") ? "A" :
-                       spokenLetter.includes("B") ? "B" :
-                       // ... alle Buchstaben entsprechend
-                       null;
-
-        if (letter && /^[A-ZÄÖÜ]$/.test(letter)) {
-            console.log("Verarbeite Buchstabe:", letter);
-            const buttons = document.querySelectorAll(".letter-button");
-            for (const button of buttons) {
-                if (button.textContent === letter && !button.disabled) {
-                    button.click(); // Direkt den Button klicken
-                    break;
-                }
+        const spokenText = transcript.trim().toUpperCase();
+        
+        // Verarbeite jeden Buchstaben im erkannten Text
+        for (const char of spokenText) {
+            if (/^[A-ZÄÖÜ]$/.test(char)) {
+                processSpokenLetter(char);
             }
         }
     };
@@ -656,6 +643,18 @@ function initSpeechRecognition() {
         console.error("Spracherkennungsfehler:", event.error);
         document.getElementById("voice-status").textContent = `Fehler: ${event.error}`;
     };
+}
+
+function processSpokenLetter(letter) {
+    if (gameEnded) return;
+    
+    const buttons = document.querySelectorAll(".letter-button");
+    for (const button of buttons) {
+        if (button.textContent === letter && !button.disabled) {
+            guessLetter(letter, button);
+            break;
+        }
+    }
 }
 
 function toggleVoiceRecognition() {
@@ -669,8 +668,21 @@ function toggleVoiceRecognition() {
         try {
             recognition.start();
         } catch (e) {
-            console.error("Fehler:", e);
+            console.error("Fehler beim Starten der Spracherkennung:", e);
             alert("Spracherkennung konnte nicht gestartet werden: " + e.message);
         }
     }
 }
+
+function stopVoiceRecognition() {
+    if (recognition && isListening) {
+        recognition.stop();
+    }
+}
+
+// Event Listener
+resetButton.addEventListener("click", init);
+document.getElementById("voice-button").addEventListener("click", toggleVoiceRecognition);
+
+// Initialisierung
+init();
