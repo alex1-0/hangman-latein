@@ -451,6 +451,7 @@ let wins = 0;
 let losses = 0;
 let recognition;
 let isListening = false;
+let recognitionActive = false;
 
 const hangmanSvg = document.getElementById("hangman-svg");
 const wordDisplay = document.getElementById("word-display");
@@ -605,33 +606,48 @@ function drawCircle(svg, cx, cy, r) {
 
 // Spracherkennungsfunktionen
 function initSpeechRecognition() {
+    // Browserkompatibilität prüfen
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     
     if (!SpeechRecognition) {
         alert("Spracherkennung wird in diesem Browser nicht unterstützt!");
-        return;
+        return false;
     }
 
     recognition = new SpeechRecognition();
-    recognition.continuous = true;
+    recognition.continuous = true; // WICHTIG: Kontinuierliche Erkennung
     recognition.interimResults = false;
     recognition.lang = "de-DE";
 
     recognition.onstart = () => {
         isListening = true;
+        recognitionActive = true;
         document.getElementById("voice-status").textContent = "Spracherkennung: Aktiv (Buchstaben sprechen)";
+        console.log("Spracherkennung gestartet");
     };
 
     recognition.onend = () => {
-        isListening = false;
-        document.getElementById("voice-status").textContent = "Spracherkennung: Inaktiv";
+        console.log("Spracherkennung beendet");
+        if (recognitionActive) {
+            // Automatisch neu starten, wenn sie unerwartet endet
+            console.log("Versuche Neustart...");
+            setTimeout(() => {
+                if (recognitionActive) {
+                    recognition.start();
+                }
+            }, 100);
+        } else {
+            isListening = false;
+            document.getElementById("voice-status").textContent = "Spracherkennung: Inaktiv";
+        }
     };
 
     recognition.onresult = (event) => {
-        const transcript = event.results[event.results.length - 1][0].transcript;
+        const transcript = event.results[event.results.length-1][0].transcript;
         const spokenText = transcript.trim().toUpperCase();
+        console.log("Erkannt:", spokenText);
         
-        // Verarbeite jeden Buchstaben im erkannten Text
+        // Verarbeite jeden einzelnen Buchstaben
         for (const char of spokenText) {
             if (/^[A-ZÄÖÜ]$/.test(char)) {
                 processSpokenLetter(char);
@@ -641,48 +657,46 @@ function initSpeechRecognition() {
 
     recognition.onerror = (event) => {
         console.error("Spracherkennungsfehler:", event.error);
-        document.getElementById("voice-status").textContent = `Fehler: ${event.error}`;
-    };
-}
-
-function processSpokenLetter(letter) {
-    if (gameEnded) return;
-    
-    const buttons = document.querySelectorAll(".letter-button");
-    for (const button of buttons) {
-        if (button.textContent === letter && !button.disabled) {
-            guessLetter(letter, button);
-            break;
+        if (event.error === 'no-speech' || event.error === 'audio-capture') {
+            // Kein ernsthafter Fehler, einfach neu starten
+            setTimeout(() => recognition.start(), 500);
+        } else {
+            document.getElementById("voice-status").textContent = `Fehler: ${event.error}`;
+            recognitionActive = false;
         }
-    }
+    };
+
+    return true;
 }
 
 function toggleVoiceRecognition() {
     if (!recognition) {
-        initSpeechRecognition();
+        if (!initSpeechRecognition()) return;
     }
 
     if (isListening) {
-        recognition.stop();
+        stopVoiceRecognition();
     } else {
-        try {
-            recognition.start();
-        } catch (e) {
-            console.error("Fehler beim Starten der Spracherkennung:", e);
-            alert("Spracherkennung konnte nicht gestartet werden: " + e.message);
-        }
+        startVoiceRecognition();
+    }
+}
+
+function startVoiceRecognition() {
+    recognitionActive = true;
+    try {
+        recognition.start();
+        document.getElementById("voice-status").textContent = "Spracherkennung: Starte...";
+    } catch (e) {
+        console.error("Startfehler:", e);
+        document.getElementById("voice-status").textContent = "Fehler beim Starten";
+        setTimeout(() => startVoiceRecognition(), 500);
     }
 }
 
 function stopVoiceRecognition() {
-    if (recognition && isListening) {
-        recognition.stop();
-    }
+    recognitionActive = false;
+    recognition.stop();
 }
 
-// Event Listener
-resetButton.addEventListener("click", init);
-document.getElementById("voice-button").addEventListener("click", toggleVoiceRecognition);
-
-// Initialisierung
-init();
+// 2. In der init()-Funktion diese Zeile hinzufügen:
+function init()
