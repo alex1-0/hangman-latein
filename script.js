@@ -450,6 +450,8 @@ let mistakes = 0;
 let gameEnded = false; // Neuer Zustand, um das Spielende zu verfolgen
 let wins = 0; // Counter für gewonnene Spiele
 let losses = 0; // Counter für verlorene Spiele
+let recognition;
+let isListening = false;
 
 const hangmanSvg = document.getElementById("hangman-svg");
 const wordDisplay = document.getElementById("word-display");
@@ -600,6 +602,71 @@ function drawCircle(svg, cx, cy, r) {
     circle.setAttribute("fill", "transparent");
     svg.appendChild(circle);
 }
+
+function initSpeechRecognition() {
+    // Browserkompatibilität prüfen
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (!SpeechRecognition) {
+        alert("Spracherkennung wird in diesem Browser nicht unterstützt!");
+        return;
+    }
+
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = "de-DE"; // Deutsch als Sprache
+
+    recognition.onstart = () => {
+        isListening = true;
+        document.getElementById("voice-status").textContent = "Spracherkennung: Aktiv";
+    };
+
+    recognition.onend = () => {
+        isListening = false;
+        document.getElementById("voice-status").textContent = "Spracherkennung: Inaktiv";
+    };
+
+    recognition.onresult = (event) => {
+        const spokenLetter = event.results[0][0].transcript.trim().toUpperCase();
+        
+        // Nur Buchstaben A-Z akzeptieren
+        if (/^[A-ZÄÖÜ]$/.test(spokenLetter)) {
+            // Finde den entsprechenden Button und "klicke" ihn
+            const buttons = document.querySelectorAll(".letter-button");
+            for (const button of buttons) {
+                if (button.textContent === spokenLetter && !button.disabled) {
+                    guessLetter(spokenLetter, button);
+                    break;
+                }
+            }
+        }
+    };
+
+    recognition.onerror = (event) => {
+        console.error("Spracherkennungsfehler:", event.error);
+        document.getElementById("voice-status").textContent = `Fehler: ${event.error}`;
+    };
+}
+
+function toggleVoiceRecognition() {
+    if (!recognition) {
+        initSpeechRecognition();
+    }
+
+    if (isListening) {
+        recognition.stop();
+    } else {
+        try {
+            recognition.start();
+        } catch (e) {
+            console.error("Fehler beim Starten der Spracherkennung:", e);
+        }
+    }
+}
+
+// Füge den Event-Listener für den Voice-Button hinzu
+document.getElementById("voice-button").addEventListener("click", toggleVoiceRecognition);
 
 resetButton.addEventListener("click", init);
 
