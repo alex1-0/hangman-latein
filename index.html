@@ -54,12 +54,53 @@
             font-weight: bold;
         }
 
-        .settings-group select {
+        .settings-group select, .settings-group input {
             width: 100%;
             padding: 8px;
             border-radius: 4px;
             border: 1px solid #ddd;
             background: white;
+        }
+
+        .lesson-probability {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .lesson-probability label {
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .lesson-probability input {
+            width: 60px;
+        }
+
+        .collapsible {
+            background-color: #eee;
+            color: #444;
+            cursor: pointer;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+
+        .collapsible:hover {
+            background-color: #ddd;
+        }
+
+        .collapsible-content {
+            padding: 0 10px;
+            display: none;
+            overflow: hidden;
+            background-color: #f9f9f9;
+            border-radius: 0 0 4px 4px;
         }
 
         #score {
@@ -210,24 +251,38 @@
         <div id="settings-panel">
             <h3>Spieleinstellungen</h3>
             
-            <div class="settings-group">
-                <label for="display-mode">Schwierigkeitsgrad (Galgenteile):</label>
-                <select id="display-mode">
-                    <option value="1">Schwer (Einzelne Teile)</option>
-                    <option value="2">Mittel (2 Teile auf einmal)</option>
-                    <option value="3">Einfach (3 Teile auf einmal)</option>
-                    <option value="all">Sehr einfach (Alle Teile sichtbar)</option>
-                </select>
+            <button class="collapsible">Schwierigkeitsgrad</button>
+            <div class="collapsible-content">
+                <div class="settings-group">
+                    <label for="display-mode">Galgenteile anzeigen:</label>
+                    <select id="display-mode">
+                        <option value="1">Schwer (Einzelne Teile)</option>
+                        <option value="2">Mittel (2 Teile auf einmal)</option>
+                        <option value="3">Einfach (3 Teile auf einmal)</option>
+                        <option value="all">Sehr einfach (Alle Teile sichtbar)</option>
+                    </select>
+                </div>
             </div>
             
-            <div class="settings-group">
-                <label for="word-length">Wortlänge bevorzugen:</label>
-                <select id="word-length">
-                    <option value="any">Beliebig</option>
-                    <option value="short">Kurze Wörter (3-5 Buchstaben)</option>
-                    <option value="medium">Mittlere Wörter (6-8 Buchstaben)</option>
-                    <option value="long">Lange Wörter (9+ Buchstaben)</option>
-                </select>
+            <button class="collapsible">Wortlänge</button>
+            <div class="collapsible-content">
+                <div class="settings-group">
+                    <label for="word-length">Wortlänge bevorzugen:</label>
+                    <select id="word-length">
+                        <option value="any">Beliebig</option>
+                        <option value="short">Kurze Wörter (3-5 Buchstaben)</option>
+                        <option value="medium">Mittlere Wörter (6-8 Buchstaben)</option>
+                        <option value="long">Lange Wörter (9+ Buchstaben)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button class="collapsible">Lektionen-Wahrscheinlichkeiten</button>
+            <div class="collapsible-content">
+                <div class="settings-group">
+                    <p>Stellen Sie die Wahrscheinlichkeit ein, mit der Wörter aus jeder Lektion erscheinen:</p>
+                    <div id="lesson-probabilities"></div>
+                </div>
             </div>
             
             <button id="save-settings" class="action-button">Einstellungen speichern</button>
@@ -254,7 +309,7 @@
     </div>
 
     <script>
-        // Erweiterte Wortliste mit verschiedenen Längen
+        // Wortliste mit Lektionen
         const words = {
             L1: [
                 { latein: "adesse, adsum, adful/(aflui)", deutsch: "da sein; helfen" },
@@ -854,6 +909,7 @@
         let isListening = false;
         let displayMode = "1"; // Standard: Einzelne Teile
         let wordLengthPref = "any"; // Standard: Beliebige Länge
+        let lessonProbabilities = {}; // Speichert Wahrscheinlichkeiten für jede Lektion
 
         // DOM-Elemente
         const hangmanSvg = document.getElementById("hangman-svg");
@@ -872,6 +928,7 @@
         const saveSettingsButton = document.getElementById("save-settings");
         const displayModeSelect = document.getElementById("display-mode");
         const wordLengthSelect = document.getElementById("word-length");
+        const lessonProbabilitiesDiv = document.getElementById("lesson-probabilities");
 
         // Galgen-Teile
         const hangmanParts = [
@@ -889,6 +946,15 @@
 
         // Initialisierung
         function init() {
+            // Initialisiere Wahrscheinlichkeiten (gleichverteilt)
+            if (Object.keys(lessonProbabilities).length === 0) {
+                const lessonCount = Object.keys(words).length;
+                const defaultProb = 100 / lessonCount;
+                for (const lesson in words) {
+                    lessonProbabilities[lesson] = defaultProb;
+                }
+            }
+            
             selectedWordObj = getRandomWord();
             guessedLetters = [];
             mistakes = 0;
@@ -910,32 +976,117 @@
             stopVoiceRecognition();
         }
 
-        // Zufälliges Wort auswählen nach Längenpräferenz
+        // Zufälliges Wort auswählen nach Wahrscheinlichkeiten und Längenpräferenz
         function getRandomWord() {
-            let filteredWords = words;
+            // 1. Wähle eine Lektion basierend auf den Wahrscheinlichkeiten
+            const lesson = weightedRandomLesson();
             
-            // Filter nach Wortlänge
+            // 2. Filtere Wörter nach Längenpräferenz
+            let filteredWords = words[lesson];
+            
             if (wordLengthPref !== "any") {
-                filteredWords = words.filter(wordObj => {
+                filteredWords = words[lesson].filter(wordObj => {
                     const length = wordObj.word.length;
                     if (wordLengthPref === "short") return length >= 3 && length <= 5;
                     if (wordLengthPref === "medium") return length >= 6 && length <= 8;
                     if (wordLengthPref === "long") return length >= 9;
                     return true;
                 });
+                
+                // Falls keine Wörter der gewünschten Länge, nimm alle
+                if (filteredWords.length === 0) {
+                    filteredWords = words[lesson];
+                }
             }
             
-            // Vermeide Wiederholung des letzten Worts
-            const availableWords = filteredWords.filter(wordObj => 
-                !selectedWordObj || wordObj.word !== selectedWordObj.word
-            );
+            // 3. Wähle zufälliges Wort aus der gefilterten Liste
+            return filteredWords[Math.floor(Math.random() * filteredWords.length)];
+        }
+
+        // Wählt eine Lektion basierend auf den Wahrscheinlichkeiten aus
+        function weightedRandomLesson() {
+            // Erstelle ein Array mit kumulativen Wahrscheinlichkeiten
+            const lessons = Object.keys(lessonProbabilities);
+            const probabilities = Object.values(lessonProbabilities);
             
-            // Falls keine Wörter übrig, nimm alle
-            if (availableWords.length === 0) {
-                return filteredWords[Math.floor(Math.random() * filteredWords.length)];
+            // Normalisiere die Wahrscheinlichkeiten (sollten sich zu 100 summieren)
+            const total = probabilities.reduce((sum, prob) => sum + prob, 0);
+            const normalizedProbs = probabilities.map(prob => prob / total * 100);
+            
+            // Erstelle kumulative Wahrscheinlichkeiten
+            const cumulativeProbs = [];
+            let cumulative = 0;
+            for (const prob of normalizedProbs) {
+                cumulative += prob;
+                cumulativeProbs.push(cumulative);
             }
             
-            return availableWords[Math.floor(Math.random() * availableWords.length)];
+            // Wähle eine Lektion basierend auf Zufallszahl
+            const random = Math.random() * 100;
+            for (let i = 0; i < cumulativeProbs.length; i++) {
+                if (random <= cumulativeProbs[i]) {
+                    return lessons[i];
+                }
+            }
+            
+            // Fallback: erste Lektion
+            return lessons[0];
+        }
+
+        // Erstellt die UI-Elemente für die Lektions-Wahrscheinlichkeiten
+        function createLessonProbabilityControls() {
+            lessonProbabilitiesDiv.innerHTML = "";
+            
+            for (const lesson in words) {
+                const div = document.createElement("div");
+                div.className = "lesson-probability";
+                
+                const label = document.createElement("label");
+                label.textContent = `Lektion ${lesson.substring(1)}:`;
+                label.htmlFor = `prob-${lesson}`;
+                
+                const input = document.createElement("input");
+                input.type = "number";
+                input.id = `prob-${lesson}`;
+                input.min = "0";
+                input.max = "100";
+                input.step = "1";
+                input.value = lessonProbabilities[lesson] || 0;
+                
+                const span = document.createElement("span");
+                span.textContent = "%";
+                
+                div.appendChild(label);
+                div.appendChild(input);
+                div.appendChild(span);
+                lessonProbabilitiesDiv.appendChild(div);
+            }
+        }
+
+        // Speichert die eingestellten Wahrscheinlichkeiten
+        function saveLessonProbabilities() {
+            const inputs = lessonProbabilitiesDiv.querySelectorAll("input");
+            let total = 0;
+            
+            // Sammle alle Werte und berechne die Summe
+            const newProbs = {};
+            inputs.forEach(input => {
+                const lesson = input.id.substring(5); // "prob-L1" -> "L1"
+                const value = parseFloat(input.value) || 0;
+                newProbs[lesson] = value;
+                total += value;
+            });
+            
+            // Wenn Summe 0 ist, setze Standardwerte
+            if (total === 0) {
+                const lessonCount = Object.keys(words).length;
+                const defaultProb = 100 / lessonCount;
+                for (const lesson in words) {
+                    newProbs[lesson] = defaultProb;
+                }
+            }
+            
+            lessonProbabilities = newProbs;
         }
 
         // Wortanzeige aktualisieren
@@ -1179,14 +1330,18 @@
         // Einstellungen
         function toggleSettings() {
             settingsPanel.style.display = settingsPanel.style.display === "block" ? "none" : "block";
-            // Aktuelle Einstellungen in Formular übernehmen
-            displayModeSelect.value = displayMode;
-            wordLengthSelect.value = wordLengthPref;
+            if (settingsPanel.style.display === "block") {
+                // Aktuelle Einstellungen in Formular übernehmen
+                displayModeSelect.value = displayMode;
+                wordLengthSelect.value = wordLengthPref;
+                createLessonProbabilityControls();
+            }
         }
 
         function saveSettings() {
             displayMode = displayModeSelect.value;
             wordLengthPref = wordLengthSelect.value;
+            saveLessonProbabilities();
             settingsPanel.style.display = "none";
             init(); // Neustart mit neuen Einstellungen
         }
@@ -1205,6 +1360,19 @@
                     }
                 }
             }
+        });
+
+        // Collapsible Panels
+        document.querySelectorAll(".collapsible").forEach(button => {
+            button.addEventListener("click", function() {
+                this.classList.toggle("active");
+                const content = this.nextElementSibling;
+                if (content.style.display === "block") {
+                    content.style.display = "none";
+                } else {
+                    content.style.display = "block";
+                }
+            });
         });
 
         // Event-Listener
