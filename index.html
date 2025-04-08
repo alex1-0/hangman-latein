@@ -16,6 +16,26 @@
             padding: 20px;
         }
 
+        .lesson-control {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            }
+
+            .lesson-control input[type="checkbox"] {
+            margin-right: 10px;
+            }
+
+            .lesson-control input[type="number"] {
+            width: 60px;
+            margin: 0 10px;
+            }
+
+            .lesson-control label {
+            flex: 1;
+            min-width: 100px;
+        }
+
         .container {
             text-align: center;
             background-color: #fff;
@@ -256,10 +276,10 @@
                 <div class="settings-group">
                     <label for="display-mode">Galgenteile anzeigen:</label>
                     <select id="display-mode">
-                        <option value="1">Schwer (Einzelne Teile)</option>
+                        <option value="1">Leicht (Einzelne Teile)</option>
                         <option value="2">Mittel (2 Teile auf einmal)</option>
-                        <option value="3">Einfach (3 Teile auf einmal)</option>
-                        <option value="all">Sehr einfach (Alle Teile sichtbar)</option>
+                        <option value="3">Schwer (3 Teile auf einmal)</option>
+                        <option value="all">Schwer AF (Alle Teile sichtbar)</option>
                     </select>
                 </div>
             </div>
@@ -279,10 +299,11 @@
             
             <button class="collapsible">Lektionen-Wahrscheinlichkeiten</button>
             <div class="collapsible-content">
-                <div class="settings-group">
-                    <p>Stellen Sie die Wahrscheinlichkeit ein, mit der Wörter aus jeder Lektion erscheinen:</p>
-                    <div id="lesson-probabilities"></div>
-                </div>
+              <div class="settings-group">
+                <p>Wählen Sie welche Lektionen aktiv sind und passen Sie die Wahrscheinlichkeiten an:</p>
+                <div id="lesson-probabilities"></div>
+                <button id="normalize-probs" class="action-button">Wahrscheinlichkeiten normalisieren</button>
+              </div>
             </div>
             
             <button id="save-settings" class="action-button">Einstellungen speichern</button>
@@ -733,8 +754,167 @@
         { word: "TALIS", translation: "derartig, ein solcher, so (beschaffen)" },
         { word: "UT", translation: "sobald; sooft" }
     ],
-        };
-
+    L16: [
+        { word: "ALIENUS", translation: "fremd" },
+        { word: "AUFERRE", translation: "wegbringen, rauben" },
+        { word: "CASUS", translation: "der Fall; der Zufall" },
+        { word: "COMPLURES", translation: "mehrere" },
+        { word: "CONFERRE", translation: "zusammentragen; vergleichen" },
+        { word: "CONSUL", translation: "der Konsul" },
+        { word: "DIGNUS", translation: "würdig, wert (einer Sache)" },
+        { word: "EXERCITUS", translation: "das Heer" },
+        { word: "FACINUS", translation: "die Handlung, die Untat" },
+        { word: "FERRE", translation: "bringen, tragen; ertragen" },
+        { word: "INFERRE", translation: "hineintragen, zufügen" },
+        { word: "INGENIUM", translation: "die Begabung, das Talent; der Verstand" },
+        { word: "MALE", translation: "schlecht, schlimm" },
+        { word: "METUS", translation: "die Angst, die Furcht" },
+        { word: "MOS", translation: "der Brauch, die Sitte; (Pl.) der Charakter" },
+        { word: "NEC", translation: "und nicht, auch nicht" },
+        { word: "REFERRE", translation: "(zurück)bringen; berichten" },
+        { word: "REGNUM", translation: "die Herrschaft, die Königsherrschaft; das Reich" },
+        { word: "SENATUS", translation: "der Senat, die Senatsversammlung" },
+        { word: "STATUERE", translation: "aufstellen; beschließen, festsetzen" },
+        { word: "USUS", translation: "der Nutzen, die Benutzung, die Ausübung" }
+    ],
+    L17: [
+        { word: "DOMUS", translation: "das Haus" },
+        { word: "HIC", translation: "dieser, diese, dieses (hier); folgender" },
+        { word: "ILLE", translation: "jener, jene, jenes; der, die, das (dort); damalig, berühmt" },
+        { word: "LITTERAE", translation: "der Brief; die Literatur; die Wissenschaften; (Sg.) der Buchstabe" },
+        { word: "PES", translation: "der Fuß" },
+        { word: "PUBLICUS", translation: "öffentlich, staatlich" },
+        { word: "UT", translation: "wie" }
+    ],
+    L18: [
+        { word: "ACIES", translation: "die Schärfe; die Schlacht; das Heer" },
+        { word: "BARBARUS", translation: "ausländisch, unzivilisiert; (Subst.) der Barbar" },
+        { word: "CRIMEN", translation: "das Verbrechen; der Vorwurf" },
+        { word: "IDEM", translation: "derselbe; der gleiche" },
+        { word: "ISTE", translation: "dieser, diese, dieses (da)" },
+        { word: "NIHIL NISI", translation: "nichts als, nur" },
+        { word: "OPORTET", translation: "es gehört sich, es ist nötig" },
+        { word: "RELIGIO", translation: "der Glaube, die (Gottes-)Verehrung, die Frömmigkeit; die Gewissenhaftigkeit" },
+        { word: "VETUS", translation: "alt" }
+    ],
+    L19: [
+        { word: "CUM", translation: "als, nachdem; weil; obwohl; während (dagegen)" },
+        { word: "ITEM", translation: "ebenso, gleichfalls" },
+        { word: "IUDICARE", translation: "urteilen, beurteilen" },
+        { word: "IUS", translation: "das Recht" },
+        { word: "NUNTIARE", translation: "melden" },
+        { word: "OCCUPARE", translation: "besetzen, einnehmen" },
+        { word: "PROVINCIA", translation: "die Provinz" },
+        { word: "SUPPLICIUM", translation: "die Hinrichtung; die Strafe; das flehentliche Bitten" }
+    ],
+    L20: [
+        { word: "ADEO", translation: "so sehr" },
+        { word: "CAPUT", translation: "der Kopf; die Hauptstadt" },
+        { word: "ISTIC", translation: "da, dort" },
+        { word: "MANUS", translation: "die Hand, die Schar (von Bewaffneten)" },
+        { word: "NE", translation: "dass nicht; damit nicht; (nach Ausdrücken des Fürchtens) dass" },
+        { word: "SOLVERE", translation: "lösen, auflösen; bezahlen" },
+        { word: "SUMERE", translation: "nehmen" },
+        { word: "UT", translation: "dass; sodass; damit, um ... zu" }
+    ],
+    L21: [
+        { word: "AGMEN", translation: "der Heereszug, der Trupp" },
+        { word: "AIO", translation: "behaupte(te) ich, sag(l)e ich" },
+        { word: "EQUES", translation: "der Reiter, der Ritter" },
+        { word: "NE", translation: "ob" },
+        { word: "ORATIO", translation: "die Rede" },
+        { word: "PROPIUS", translation: "näher" },
+        { word: "QUDAM", translation: "ein gewisser, (irgend)ein; (Pl.) einige" },
+        { word: "SUB", translation: "unten an, unten bei, unter (wo?)" },
+        { word: "TOTUS", translation: "ganz" },
+        { word: "UNDE", translation: "woher, von wo?" },
+        { word: "VULNUS", translation: "die Wunde; der (militärische) Verlust" }
+    ],
+    L22: [
+        { word: "ADVENTUS", translation: "die Ankunft" },
+        { word: "AUT", translation: "oder" },
+        { word: "AUT ... AUT", translation: "entweder ... oder" },
+        { word: "FERRUM", translation: "das Eisen; die Waffe" },
+        { word: "IMPETUS", translation: "der Angriff; der Schwung" },
+        { word: "IPSE", translation: "(er, sie, es) selbst, persönlich, gerade, sogar" },
+        { word: "LEGATUS", translation: "der Gesandte, der Bevollmächtigte" },
+        { word: "LIBER", translation: "frei" },
+        { word: "NE", translation: "nicht (verneinter Befehl oder Wunsch)" },
+        { word: "ORDO", translation: "die Ordnung; die Reihe; der Stand" },
+        { word: "PLUS", translation: "mehr" },
+        { word: "POTIUS", translation: "eher, lieber" },
+        { word: "PRAETOR", translation: "der Prätor" },
+        { word: "SANGUIS", translation: "das Blut" },
+        { word: "TOLLERE", translation: "aufheben, in die Höhe heben; wegnehmen" },
+        { word: "TRANSIRE", translation: "durchqueren; überschreiten" }
+    ],
+    L23: [
+        { word: "CAUSA", translation: "wegen; um ... zu" },
+        { word: "LOQUI", translation: "reden, sprechen" },
+        { word: "MAGIS", translation: "mehr, eher" },
+        { word: "NASCI", translation: "entstehen, geboren werden" },
+        { word: "PROFICISCI", translation: "reisen, abreisen, aufbrechen" },
+        { word: "QUERI", translation: "klagen, sich beklagen (über)" },
+        { word: "SEQUI", translation: "(jmdm.) folgen" },
+        { word: "TANTUS", translation: "so groß, so viel" },
+        { word: "TOT", translation: "so viel" },
+        { word: "UTI", translation: "(etw.) benutzen, gebrauchen" }
+    ],
+    L24: [
+        { word: "AEQUUS", translation: "eben, gerecht, gleich" },
+        { word: "ALTER", translation: "der eine / der andere (von zweien)" },
+        { word: "QUIN", translation: "dass (in festen Wendungen)" },
+        { word: "QUISQUAM", translation: "irgendjemand, irgendetwas" },
+        { word: "RECTUS", translation: "richtig, recht; gerade" },
+        { word: "SOLERE", translation: "gewohnt sein, gewöhnlich etw. tun" }
+    ],
+    L25: [
+        { word: "IUDEX", translation: "der Richter" },
+        { word: "IUDICIUM", translation: "das Urteil; das Gericht" },
+        { word: "PRAETER", translation: "außer" },
+        { word: "QUIN", translation: "vielmehr; warum nicht" },
+        { word: "SENEX", translation: "der Greis, der alte Mann" },
+        { word: "ULTIMUS", translation: "der äußerste, entfernteste, letzte" },
+        { word: "VULTUS", translation: "das Gesicht, der Gesichtsausdruck; (Pl.) die Gesichtszüge" }
+    ],
+    L26: [
+        { word: "FIERI", translation: "gemacht werden, geschehen, werden" },
+        { word: "TRES", translation: "drei" }
+    ],
+    L27: [
+        { word: "AURUM", translation: "das Gold" },
+        { word: "MODO", translation: "eben (noch), nur" },
+        { word: "PARUM", translation: "(zu) wenig" },
+        { word: "QUO", translation: "(= ut co) damit umso" },
+        { word: "VERUM", translation: "aber, sondern" }
+    ],
+    L28: [
+        { word: "ALIQUIS", translation: "jemand, irgendjemand" },
+        { word: "AMICITIA", translation: "die Freundschaft" },
+        { word: "ARBITRARI", translation: "glauben, meinen" },
+        { word: "EQUITATUS", translation: "die Reiterei" },
+        { word: "FRUMENTUM", translation: "das Getreide" },
+        { word: "MORI", translation: "sterben" },
+        { word: "PATI", translation: "leiden, erleiden, ertragen, zulassen" },
+        { word: "POLLICERI", translation: "versprechen" },
+        { word: "QUANTUS", translation: "wie groß, wie viel" },
+        { word: "VIDERI", translation: "scheinen, gelten (als)" }
+    ],
+    L29: [
+        { word: "OB", translation: "wegen" },
+        { word: "VEL", translation: "oder; sogar" }
+    ],
+    L30: [
+        { word: "LIBER", translation: "das Buch" },
+        { word: "MEDIUS", translation: "der mittlere, in der Mitte (von)" },
+        { word: "ORIRI", translation: "entstehen, sich erheben" },
+        { word: "OS", translation: "der Mund; das Gesicht" },
+        { word: "QUASI", translation: "wie wenn, als ob" },
+        { word: "QUISQUE", translation: "jeder" },
+        { word: "SIMUL", translation: "sobald" },
+        { word: "UTERQUE", translation: "beide, jeder (von zweien)" }
+    ]
+};
 
         // Spielvariablen
         let selectedWordObj = null;
@@ -788,11 +968,11 @@
         function init() {
             // Initialisiere Wahrscheinlichkeiten (gleichverteilt)
             if (Object.keys(lessonProbabilities).length === 0) {
-                const lessonCount = Object.keys(words).length;
-                const defaultProb = 100 / lessonCount;
-                for (const lesson in words) {
-                    lessonProbabilities[lesson] = defaultProb;
-                }
+                const lessons = Object.keys(words);
+                const defaultProb = 100 / lessons.length;
+                lessons.forEach(lesson => {
+                lessonProbabilities[lesson] = defaultProb;
+                });
             }
             
             selectedWordObj = getRandomWord();
@@ -873,34 +1053,114 @@
             return lessons[0];
         }
 
-        // Erstellt die UI-Elemente für die Lektions-Wahrscheinlichkeiten
-        function createLessonProbabilityControls() {
-            lessonProbabilitiesDiv.innerHTML = "";
-            
-            for (const lesson in words) {
-                const div = document.createElement("div");
-                div.className = "lesson-probability";
-                
-                const label = document.createElement("label");
-                label.textContent = `Lektion ${lesson.substring(1)}:`;
-                label.htmlFor = `prob-${lesson}`;
-                
-                const input = document.createElement("input");
-                input.type = "number";
-                input.id = `prob-${lesson}`;
-                input.min = "0";
-                input.max = "100";
-                input.step = "1";
-                input.value = lessonProbabilities[lesson] || 0;
-                
-                const span = document.createElement("span");
-                span.textContent = "%";
-                
-                div.appendChild(label);
-                div.appendChild(input);
-                div.appendChild(span);
-                lessonProbabilitiesDiv.appendChild(div);
-            }
+// Initialisierung der Lektionen-Controls
+function createLessonProbabilityControls() {
+  lessonProbabilitiesDiv.innerHTML = "";
+  
+  const lessons = Object.keys(words).sort();
+  const activeLessons = lessons.filter(lesson => lessonProbabilities[lesson] > 0);
+  
+  lessons.forEach(lesson => {
+    const div = document.createElement("div");
+    div.className = "lesson-control";
+    
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.id = `check-${lesson}`;
+    checkbox.checked = activeLessons.includes(lesson);
+    checkbox.addEventListener("change", () => toggleLessonActive(lesson));
+    
+    const label = document.createElement("label");
+    label.htmlFor = `check-${lesson}`;
+    label.textContent = `Lektion ${lesson.substring(1)}`;
+    
+    const input = document.createElement("input");
+    input.type = "number";
+    input.id = `prob-${lesson}`;
+    input.min = "0";
+    input.max = "100";
+    input.step = "1";
+    input.value = lessonProbabilities[lesson] || 0;
+    input.disabled = !checkbox.checked;
+    input.addEventListener("input", () => normalizeProbabilities());
+    
+    const span = document.createElement("span");
+    span.textContent = "%";
+    
+    div.appendChild(checkbox);
+    div.appendChild(label);
+    div.appendChild(input);
+    div.appendChild(span);
+    lessonProbabilitiesDiv.appendChild(div);
+  });
+}
+
+// Lektion aktivieren/deaktivieren
+function toggleLessonActive(lesson) {
+  const checkbox = document.getElementById(`check-${lesson}`);
+  const input = document.getElementById(`prob-${lesson}`);
+  
+  input.disabled = !checkbox.checked;
+  if (!checkbox.checked) {
+    input.value = 0;
+  }
+  normalizeProbabilities();
+}
+
+// Wahrscheinlichkeiten automatisch anpassen
+function normalizeProbabilities() {
+  const lessons = Object.keys(words);
+  const activeInputs = [];
+  let total = 0;
+  
+  // Aktive Lektionen finden und Summe berechnen
+  lessons.forEach(lesson => {
+    const checkbox = document.getElementById(`check-${lesson}`);
+    const input = document.getElementById(`prob-${lesson}`);
+    
+    if (checkbox.checked) {
+      const value = parseFloat(input.value) || 0;
+      total += value;
+      activeInputs.push(input);
+    }
+  });
+  
+  // Wenn Summe nicht 100%, anpassen
+  if (total !== 100 && activeInputs.length > 0) {
+    const factor = 100 / total;
+    activeInputs.forEach(input => {
+      const newValue = Math.round((parseFloat(input.value) || 0) * factor);
+      input.value = Math.min(100, Math.max(0, newValue));
+    });
+  }
+}
+
+// Normalisierungs-Button
+document.getElementById("normalize-probs").addEventListener("click", normalizeProbabilities);
+
+        // Einstellungen speichern
+        function saveLessonProbabilities() {
+        const lessons = Object.keys(words);
+        const newProbs = {};
+        let total = 0;
+        
+        lessons.forEach(lesson => {
+            const checkbox = document.getElementById(`check-${lesson}`);
+            const input = document.getElementById(`prob-${lesson}`);
+            const value = checkbox.checked ? (parseFloat(input.value) || 0) : 0;
+            newProbs[lesson] = value;
+            total += value;
+        });
+        
+        // Falls Summe 0, Standardwerte setzen
+        if (total === 0) {
+            const activeCount = lessons.filter(l => document.getElementById(`check-${l}`).checked).length || 1;
+            lessons.forEach(lesson => {
+            newProbs[lesson] = document.getElementById(`check-${lesson}`).checked ? (100 / activeCount) : 0;
+            });
+        }
+        
+        lessonProbabilities = newProbs;
         }
 
         // Speichert die eingestellten Wahrscheinlichkeiten
@@ -1026,7 +1286,7 @@
                 winsSpan.textContent = wins;
                 gameEnded = true;
                 clearInterval(timerInterval);
-            } else if (displayMode === "all" ? mistakes > 0 : mistakes >= hangmanParts.length) {
+            } else if (displayMode === "all" ? mistakes >= 1 : mistakes >= Math.ceil(hangmanParts.length / displayMode)) {
                 messageDiv.textContent = `Verloren! Das Wort war: ${selectedWordObj.word}`;
                 translationDiv.textContent = `Deutsche Bedeutung: ${selectedWordObj.translation}`;
                 losses++;
