@@ -1180,7 +1180,7 @@ document.getElementById("normalize-probs").addEventListener("click", normalizePr
             // Wenn Summe 0 ist, setze Standardwerte
             if (total === 0) {
                 const lessonCount = Object.keys(words).length;
-                const defaultProb = parseFloat((100 / lessonCount).toFixed(4));
+                const defaultProb = parseFloat((100 / lessonCount).toFixed(3));
                 for (const lesson in words) {
                     newProbs[lesson] = defaultProb;
                 }
