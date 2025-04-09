@@ -1101,9 +1101,6 @@ function toggleLessonActive(lesson) {
   const input = document.getElementById(`prob-${lesson}`);
   
   input.disabled = !checkbox.checked;
-  if (!checkbox.checked) {
-    input.value = 0;
-  }
   
   // Neuberechnung aller Wahrscheinlichkeiten
   normalizeProbabilities();
