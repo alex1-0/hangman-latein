@@ -1057,7 +1057,11 @@
 function createLessonProbabilityControls() {
   lessonProbabilitiesDiv.innerHTML = "";
   
-  const lessons = Object.keys(words).sort();
+  // Numerisch sortierte Lektionen (L1, L2, L3,...)
+  const lessons = Object.keys(words).sort((a, b) => {
+    return parseInt(a.substring(1)) - parseInt(b.substring(1));
+  });
+  
   const activeLessons = lessons.filter(lesson => lessonProbabilities[lesson] > 0);
   
   lessons.forEach(lesson => {
@@ -1072,7 +1076,7 @@ function createLessonProbabilityControls() {
     
     const label = document.createElement("label");
     label.htmlFor = `check-${lesson}`;
-    label.textContent = `Lektion ${lesson.substring(1)}`;
+    label.textContent = `Lektion ${lesson.substring(1)}`; // Zeigt nur die Zahl an (ohne "L")
     
     const input = document.createElement("input");
     input.type = "number";
@@ -1080,7 +1084,7 @@ function createLessonProbabilityControls() {
     input.min = "0";
     input.max = "100";
     input.step = "1";
-    input.value = lessonProbabilities[lesson] ? parseFloat(lessonProbabilities[lesson].toFixed(3)) : 0;
+    input.value = lessonProbabilities[lesson] ? parseFloat(lessonProbabilities[lesson].toFixed(2)) : 0;
     input.disabled = !checkbox.checked;
     input.addEventListener("input", () => normalizeProbabilities());
     
