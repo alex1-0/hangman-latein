@@ -1348,53 +1348,81 @@ document.getElementById("normalize-probs").addEventListener("click", normalizePr
         }
 
         // Spracherkennung
-function initSpeechRecognition() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    
-    if (!SpeechRecognition) {
-        voiceStatus.textContent = "Spracherkennung nicht unterstützt";
-        return false;
-    }
-
-    recognition = new SpeechRecognition();
-    recognition.continuous = true;      // 🔥 Wichtig: Dauerhafte Erkennung
-    recognition.interimResults = true;  // 🔥 Sofortige Ergebnisse
-    recognition.lang = "de-DE";
-    recognition.maxAlternatives = 3;
-
-    recognition.onstart = () => {
-        isListening = true;
-        voiceButton.classList.add("listening");
-        voiceStatus.textContent = "Spracherkennung: Aktiv (Buchstaben sagen)";
-    };
-
-    recognition.onend = () => {
-        if (isListening) {
-            voiceStatus.textContent = "Spracherkennung: Verbindung unterbrochen";
-            voiceButton.classList.remove("listening");
-            isListening = false;
-        }
-    };
-
-    recognition.onresult = (event) => {
-        // 🔥 Verarbeite alle Ergebnisse sofort
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            const transcript = event.results[i][0].transcript.trim().toUpperCase();
+// Spracherkennung
+        function initSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             
-            if (event.results[i].isFinal) {
+            if (!SpeechRecognition) {
+                voiceStatus.textContent = "Spracherkennung nicht unterstützt";
+                return false;
+            }
+        
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;      // Dauerhafte Erkennung
+            recognition.interimResults = false; // Nur finale Ergebnisse
+            recognition.lang = "de-DE";
+            recognition.maxAlternatives = 1;    // Nur die beste Alternative
+        
+            recognition.onstart = () => {
+                isListening = true;
+                voiceButton.classList.add("listening");
+                voiceStatus.textContent = "Spracherkennung: Aktiv (Buchstaben sagen)";
+            };
+        
+            recognition.onend = () => {
+                if (isListening) {
+                    // Automatisch neu starten, solange aktiv
+                    recognition.start();
+                }
+            };
+        
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript.trim().toUpperCase();
                 processSpokenInput(transcript);
+            };
+        
+            recognition.onerror = (event) => {
+                console.error("Spracherkennungsfehler:", event.error);
+                voiceStatus.textContent = `Fehler: ${event.error}`;
+                stopVoiceRecognition();
+            };
+        
+            return true;
+        }
+        
+        function toggleVoiceRecognition() {
+            if (!recognition) {
+                if (!initSpeechRecognition()) {
+                    alert("Spracherkennung wird in diesem Browser nicht unterstützt!");
+                    return;
+                }
+            }
+        
+            if (isListening) {
+                stopVoiceRecognition();
+            } else {
+                startVoiceRecognition();
             }
         }
-    };
-
-    recognition.onerror = (event) => {
-        console.error("Spracherkennungsfehler:", event.error);
-        voiceStatus.textContent = `Fehler: ${event.error}`;
-        stopVoiceRecognition();
-    };
-
-    return true;
-}
+        
+        function startVoiceRecognition() {
+            isListening = true;
+            try {
+                recognition.start();
+                voiceStatus.textContent = "Spracherkennung startet...";
+            } catch (e) {
+                console.error("Fehler beim Starten:", e);
+                voiceStatus.textContent = "Fehler beim Starten der Spracherkennung";
+                isListening = false;
+            }
+        }
+        
+        function stopVoiceRecognition() {
+            isListening = false;
+            voiceButton.classList.remove("listening");
+            voiceStatus.textContent = "Spracherkennung: Inaktiv";
+            recognition.stop();
+        }
 
         function processSpokenInput(input) {
             if (gameEnded) return;
