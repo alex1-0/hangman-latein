@@ -1348,52 +1348,53 @@ document.getElementById("normalize-probs").addEventListener("click", normalizePr
         }
 
         // Spracherkennung
-        function initSpeechRecognition() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            
-            if (!SpeechRecognition) {
-                voiceStatus.textContent = "Spracherkennung nicht unterstützt";
-                return false;
-            }
+function initSpeechRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (!SpeechRecognition) {
+        voiceStatus.textContent = "Spracherkennung nicht unterstützt";
+        return false;
+    }
 
-            recognition = new SpeechRecognition();
-            recognition.continuous = true;  // Dauerhafte Erkennung
-            recognition.interimResults = true;  // Sofortige Ergebnisse (nicht erst am Ende)
-            recognition.lang = "de-DE";
-            recognition.maxAlternatives = 3;
+    recognition = new SpeechRecognition();
+    recognition.continuous = true;      // 🔥 Wichtig: Dauerhafte Erkennung
+    recognition.interimResults = true;  // 🔥 Sofortige Ergebnisse
+    recognition.lang = "de-DE";
+    recognition.maxAlternatives = 3;
 
-            recognition.onstart = () => {
-                isListening = true;
-                voiceButton.classList.add("listening");
-                voiceStatus.textContent = "Spracherkennung: Aktiv (Buchstaben oder Wörter sprechen)";
-            };
+    recognition.onstart = () => {
+        isListening = true;
+        voiceButton.classList.add("listening");
+        voiceStatus.textContent = "Spracherkennung: Aktiv (Buchstaben sagen)";
+    };
 
-            recognition.onend = () => {
-                if (isListening) {
-                    recognition.start();
-                }
-            };
-
-            recognition.onresult = (event) => {
-                // Durch alle Zwischenergebnisse iterieren
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    const transcript = event.results[i][0].transcript.trim().toUpperCase();
-                    
-                    // Nur finale Ergebnisse verarbeiten (keine Zwischenergebnisse)
-                    if (event.results[i].isFinal) {
-                        processSpokenInput(transcript);
-                    }
-                }
-            };
-
-            recognition.onerror = (event) => {
-                console.error("Spracherkennungsfehler:", event.error);
-                voiceStatus.textContent = `Fehler: ${event.error}`;
-                stopVoiceRecognition();
-            };
-
-            return true;
+    recognition.onend = () => {
+        if (isListening) {
+            voiceStatus.textContent = "Spracherkennung: Verbindung unterbrochen";
+            voiceButton.classList.remove("listening");
+            isListening = false;
         }
+    };
+
+    recognition.onresult = (event) => {
+        // 🔥 Verarbeite alle Ergebnisse sofort
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript.trim().toUpperCase();
+            
+            if (event.results[i].isFinal) {
+                processSpokenInput(transcript);
+            }
+        }
+    };
+
+    recognition.onerror = (event) => {
+        console.error("Spracherkennungsfehler:", event.error);
+        voiceStatus.textContent = `Fehler: ${event.error}`;
+        stopVoiceRecognition();
+    };
+
+    return true;
+}
 
         function processSpokenInput(input) {
             if (gameEnded) return;
