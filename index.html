@@ -1100,62 +1100,58 @@ function createLessonProbabilityControls() {
 }
 
 // Lektion aktivieren/deaktivieren
+// Lektion aktivieren/deaktivieren
 function toggleLessonActive(lesson) {
   const checkbox = document.getElementById(`check-${lesson}`);
   const input = document.getElementById(`prob-${lesson}`);
   
-  input.disabled = !checkbox.checked;
+  if (checkbox.checked) {
+    // Lektion aktivieren - setze auf Standardwert
+    input.disabled = false;
+    
+    // Berechne neue Standardwahrscheinlichkeit (gleichmäßig verteilt)
+    const activeLessons = getActiveLessons();
+    const newProb = activeLessons.length > 0 ? (100 / activeLessons.length) : 0;
+    
+    // Setze den Wert und aktualisiere die Anzeige
+    input.value = newProb.toFixed(2);
+    lessonProbabilities[lesson] = newProb;
+  } else {
+    // Lektion deaktivieren - setze auf 0
+    input.disabled = true;
+    input.value = "0";
+    lessonProbabilities[lesson] = 0;
+  }
   
   // Neuberechnung aller Wahrscheinlichkeiten
   normalizeProbabilities();
 }
 
+// Hilfsfunktion um aktive Lektionen zu erhalten
+function getActiveLessons() {
+  const lessons = Object.keys(words);
+  return lessons.filter(lesson => {
+    const checkbox = document.getElementById(`check-${lesson}`);
+    return checkbox.checked;
+  });
+}
+
+// Wahrscheinlichkeiten automatisch anpassen
 // Wahrscheinlichkeiten automatisch anpassen
 function normalizeProbabilities() {
-  const lessons = Object.keys(words);
-  const activeInputs = [];
-  let total = 0;
+  const activeLessons = getActiveLessons();
   
-  // 1. Summe der aktiven Wahrscheinlichkeiten berechnen
-  lessons.forEach(lesson => {
-    const checkbox = document.getElementById(`check-${lesson}`);
+  // Wenn keine aktiven Lektionen: nichts tun
+  if (activeLessons.length === 0) return;
+  
+  // Gleichmäßige Verteilung berechnen
+  const equalProb = 100 / activeLessons.length;
+  
+  // Werte setzen
+  activeLessons.forEach(lesson => {
     const input = document.getElementById(`prob-${lesson}`);
-    
-    if (checkbox.checked) {
-      const value = parseFloat(input.value) || 0;
-      total += value;
-      activeInputs.push(input);
-    }
-  });
-
-  // 2. Wenn keine aktiven Lektionen: Standardwerte setzen
-  if (activeInputs.length === 0) {
-    lessons.forEach(lesson => {
-      document.getElementById(`prob-${lesson}`).value = 0;
-    });
-    return;
-  }
-
-  // 3. Wenn Summe nicht 100%: Neuverteilung
-  if (total !== 100) {
-    const remaining = 100 - total;
-    const adjustmentPerActive = remaining / activeInputs.length;
-    
-    activeInputs.forEach(input => {
-      const currentValue = parseFloat(input.value) || 0;
-      const newValue = parseFloat((currentValue + adjustmentPerActive).toFixed(2));
-      input.value = Math.max(0, Math.min(100, newValue));
-    });
-  }
-
-  // 4. Sicherstellen, dass kein Wert unter 0 oder über 100
-  lessons.forEach(lesson => {
-    const input = document.getElementById(`prob-${lesson}`);
-    if (input) {
-      let value = parseFloat(input.value) || 0;
-      value = Math.max(0, Math.min(100, value));
-      input.value = value.toFixed(2);
-    }
+    input.value = equalProb.toFixed(2);
+    lessonProbabilities[lesson] = equalProb;
   });
 }
 
