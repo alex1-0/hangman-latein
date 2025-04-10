@@ -1357,8 +1357,8 @@ document.getElementById("normalize-probs").addEventListener("click", normalizePr
             }
 
             recognition = new SpeechRecognition();
-            recognition.continuous = true;
-            recognition.interimResults = false;
+            recognition.continuous = true;  // Dauerhafte Erkennung
+            recognition.interimResults = true;  // Sofortige Ergebnisse (nicht erst am Ende)
             recognition.lang = "de-DE";
             recognition.maxAlternatives = 3;
 
@@ -1375,8 +1375,15 @@ document.getElementById("normalize-probs").addEventListener("click", normalizePr
             };
 
             recognition.onresult = (event) => {
-                const transcript = event.results[event.results.length - 1][0].transcript;
-                processSpokenInput(transcript);
+                // Durch alle Zwischenergebnisse iterieren
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript.trim().toUpperCase();
+                    
+                    // Nur finale Ergebnisse verarbeiten (keine Zwischenergebnisse)
+                    if (event.results[i].isFinal) {
+                        processSpokenInput(transcript);
+                    }
+                }
             };
 
             recognition.onerror = (event) => {
