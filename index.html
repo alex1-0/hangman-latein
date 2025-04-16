@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -993,7 +994,6 @@
             timerDiv.textContent = "Verstrichene Zeit: 0s";
             
             resetHangman();
-            stopVoiceRecognition();
         }
 
         // Zufälliges Wort auswählen nach Wahrscheinlichkeiten und Längenpräferenz
@@ -1356,37 +1356,39 @@ document.getElementById("normalize-probs").addEventListener("click", normalizePr
                 voiceStatus.textContent = "Spracherkennung nicht unterstützt";
                 return false;
             }
-        
+
             recognition = new SpeechRecognition();
-            recognition.continuous = true;      // Dauerhafte Erkennung
-            recognition.interimResults = false; // Nur finale Ergebnisse
+            recognition.continuous = true;       // WICHTIG: Kontinuierliche Erkennung
+            recognition.interimResults = false;  // Nur finale Ergebnisse
             recognition.lang = "de-DE";
-            recognition.maxAlternatives = 1;    // Nur die beste Alternative
-        
+            recognition.maxAlternatives = 1;     // Nur beste Alternative
+
             recognition.onstart = () => {
                 isListening = true;
                 voiceButton.classList.add("listening");
                 voiceStatus.textContent = "Spracherkennung: Aktiv (Buchstaben sagen)";
             };
-        
+
             recognition.onend = () => {
                 if (isListening) {
-                    // Automatisch neu starten, solange aktiv
-                    recognition.start();
+                    setTimeout(() => {
+                        try { recognition.start(); } 
+                        catch (e) { console.error("Neustart fehlgeschlagen:", e); }
+                    }, 100); // Kurze Verzögerung für Firefox
                 }
             };
-        
+
             recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript.trim().toUpperCase();
                 processSpokenInput(transcript);
             };
-        
+
             recognition.onerror = (event) => {
                 console.error("Spracherkennungsfehler:", event.error);
                 voiceStatus.textContent = `Fehler: ${event.error}`;
                 stopVoiceRecognition();
             };
-        
+
             return true;
         }
         
@@ -1397,14 +1399,14 @@ document.getElementById("normalize-probs").addEventListener("click", normalizePr
                     return;
                 }
             }
-        
+
             if (isListening) {
                 stopVoiceRecognition();
             } else {
                 startVoiceRecognition();
             }
         }
-        
+
         function startVoiceRecognition() {
             isListening = true;
             try {
@@ -1416,7 +1418,7 @@ document.getElementById("normalize-probs").addEventListener("click", normalizePr
                 isListening = false;
             }
         }
-        
+
         function stopVoiceRecognition() {
             isListening = false;
             voiceButton.classList.remove("listening");
