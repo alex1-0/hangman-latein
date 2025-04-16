@@ -928,6 +928,8 @@
         let losses = 0;
         let recognition;
         let isListening = false;
+        let restartAttempts = 0;
+        const MAX_RESTART_ATTEMPTS = 3;
         let displayMode = "1"; // Standard: Einzelne Teile
         let wordLengthPref = "any"; // Standard: Beliebige Länge
         let lessonProbabilities = {}; // Speichert Wahrscheinlichkeiten für jede Lektion
@@ -1351,46 +1353,64 @@ document.getElementById("normalize-probs").addEventListener("click", normalizePr
 // Spracherkennung
         function initSpeechRecognition() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            
             if (!SpeechRecognition) {
                 voiceStatus.textContent = "Spracherkennung nicht unterstützt";
                 return false;
             }
 
             recognition = new SpeechRecognition();
-            recognition.continuous = true;       // WICHTIG: Kontinuierliche Erkennung
-            recognition.interimResults = false;  // Nur finale Ergebnisse
+            recognition.continuous = true;  // Kontinuierliche Erkennung
+            recognition.interimResults = false;
             recognition.lang = "de-DE";
-            recognition.maxAlternatives = 1;     // Nur beste Alternative
 
             recognition.onstart = () => {
                 isListening = true;
+                restartAttempts = 0; // Reset der Neustart-Versuche
                 voiceButton.classList.add("listening");
                 voiceStatus.textContent = "Spracherkennung: Aktiv (Buchstaben sagen)";
             };
 
             recognition.onend = () => {
-                if (isListening) {
-                    setTimeout(() => {
-                        try { recognition.start(); } 
-                        catch (e) { console.error("Neustart fehlgeschlagen:", e); }
-                    }, 100); // Kurze Verzögerung für Firefox
+                if (!isListening) return;
+
+                // Verhindere zu viele Neustarts (falls Chrome blockiert)
+                if (restartAttempts >= MAX_RESTART_ATTEMPTS) {
+                    voiceStatus.textContent = "Spracherkennung: Neu gestartet (zu viele Fehler)";
+                    stopVoiceRecognition();
+                    startVoiceRecognition(); // Komplett neu starten
+                    return;
                 }
+
+                // Neu starten mit Verzögerung (Chrome-Bug-Umgehung)
+                setTimeout(() => {
+                    try {
+                        recognition.start();
+                        restartAttempts++;
+                    } catch (e) {
+                        console.error("Neustart fehlgeschlagen:", e);
+                        stopVoiceRecognition();
+                    }
+                }, 300); // 300ms Verzögerung (länger für Stabilität)
             };
 
             recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript.trim().toUpperCase();
                 processSpokenInput(transcript);
+                restartAttempts = 0; // Reset bei erfolgreicher Erkennung
             };
 
             recognition.onerror = (event) => {
+                if (event.error === "no-speech" || event.error === "audio-capture") {
+                    return; // Harmlose Fehler ignorieren
+                }
                 console.error("Spracherkennungsfehler:", event.error);
-                voiceStatus.textContent = `Fehler: ${event.error}`;
                 stopVoiceRecognition();
             };
 
             return true;
         }
+
+
         
         function toggleVoiceRecognition() {
             if (!recognition) {
@@ -1420,10 +1440,17 @@ document.getElementById("normalize-probs").addEventListener("click", normalizePr
         }
 
         function stopVoiceRecognition() {
+            if (restartTimeout) clearTimeout(restartTimeout);
             isListening = false;
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (e) {
+                    console.error("Fehler beim Stoppen:", e);
+                }
+            }
             voiceButton.classList.remove("listening");
             voiceStatus.textContent = "Spracherkennung: Inaktiv";
-            recognition.stop();
         }
 
         function processSpokenInput(input) {
@@ -1467,22 +1494,28 @@ document.getElementById("normalize-probs").addEventListener("click", normalizePr
         }
 
         function startVoiceRecognition() {
-            isListening = true;
+            if (!recognition && !initSpeechRecognition()) {
+                return;
+            }
             try {
                 recognition.start();
-                voiceStatus.textContent = "Spracherkennung startet...";
             } catch (e) {
-                console.error("Fehler beim Starten:", e);
-                voiceStatus.textContent = "Fehler beim Starten der Spracherkennung";
-                isListening = false;
+                console.error("Start fehlgeschlagen:", e);
+                voiceStatus.textContent = "Fehler: " + e.message;
             }
         }
 
         function stopVoiceRecognition() {
             isListening = false;
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (e) {
+                    console.error("Stopp fehlgeschlagen:", e);
+                }
+            }
             voiceButton.classList.remove("listening");
             voiceStatus.textContent = "Spracherkennung: Inaktiv";
-            recognition.stop();
         }
 
         // Einstellungen
