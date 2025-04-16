@@ -1394,9 +1394,11 @@ document.getElementById("normalize-probs").addEventListener("click", normalizePr
             };
 
             recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript.trim().toUpperCase();
-                processSpokenInput(transcript);
-                restartAttempts = 0; // Reset bei erfolgreicher Erkennung
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript.trim().toUpperCase();
+                    processSpokenInput(transcript);
+                }
+                restartAttempts = 0;
             };
 
             recognition.onerror = (event) => {
