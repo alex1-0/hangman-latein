@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -6,136 +5,215 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galgenmännchen Spiel</title>
     <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --primary-color: #bb86fc;
+            --primary-dark: #3700b3;
+            --secondary-color: #03dac6;
+            --error-color: #cf6679;
+            --success-color: #4caf50;
+            --border-color: #333;
+            --hover-color: #2a2a2a;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, opacity 0.3s ease;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
-        }
-
-        .lesson-control {
-            display: flex;
-            align-items: center;
-            margin-bottom: 8px;
-            }
-
-            .lesson-control input[type="checkbox"] {
-            margin-right: 10px;
-            }
-
-            .lesson-control input[type="number"] {
-            width: 60px;
-            margin: 0 10px;
-            }
-
-            .lesson-control label {
-            flex: 1;
-            min-width: 100px;
+            line-height: 1.6;
         }
 
         .container {
             text-align: center;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             width: 100%;
             max-width: 800px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
         }
 
         #settings-panel {
             display: none;
             margin: 20px auto;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border: 1px solid #ddd;
+            padding: 1.5rem;
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
             max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            animation: fadeIn 0.3s ease-out;
         }
 
-        #settings-panel h3 {
-            margin-top: 0;
-            color: #333;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 10px;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
+        
+        }
+
+        .fadeOut {
+            animation: fadeOut 0.3s ease-out forwards;
         }
 
         .settings-group {
-            margin-bottom: 15px;
+            margin-bottom: 1.5rem;
             text-align: left;
         }
 
         .settings-group label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary-color);
         }
 
-        .settings-group select, .settings-group input {
+        .settings-group select, 
+        .settings-group input {
             width: 100%;
-            padding: 8px;
+            padding: 0.75rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: rgba(50, 50, 50, 0.5);
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        .settings-group select:focus, 
+        .settings-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.3);
+        }
+
+        .lesson-control {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 6px;
+        }
+
+        .lesson-control:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .lesson-control input[type="checkbox"] {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-color);
+        }
+
+        .lesson-control input[type="number"] {
+            width: 70px;
+            margin: 0 12px;
+            padding: 0.5rem;
+            background: rgba(50, 50, 50, 0.5);
+            border: 1px solid var(--border-color);
             border-radius: 4px;
-            border: 1px solid #ddd;
-            background: white;
+            color: var(--text-color);
+        }
+
+        .lesson-control label {
+            flex: 1;
+            min-width: 100px;
+            color: var(--text-color);
         }
 
         .lesson-probability {
             display: flex;
             align-items: center;
-            margin-bottom: 5px;
-        }
-
-        .lesson-probability label {
-            flex: 1;
-            margin-right: 10px;
-        }
-
-        .lesson-probability input {
-            width: 60px;
+            margin-bottom: 0.5rem;
         }
 
         .collapsible {
-            background-color: #eee;
-            color: #444;
+            background-color: rgba(55, 0, 179, 0.2);
+            color: var(--primary-color);
             cursor: pointer;
-            padding: 10px;
+            padding: 1rem;
             width: 100%;
             border: none;
             text-align: left;
             outline: none;
-            font-size: 15px;
-            margin: 5px 0;
-            border-radius: 4px;
+            font-size: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .collapsible:hover {
-            background-color: #ddd;
+            background-color: rgba(55, 0, 179, 0.3);
+        }
+
+        .collapsible::after {
+            content: '+';
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .collapsible.active::after {
+            content: '-';
+            transform: rotate(0deg);
         }
 
         .collapsible-content {
-            padding: 0 10px;
-            display: none;
+            padding: 0;
+            max-height: 0;
             overflow: hidden;
-            background-color: #f9f9f9;
-            border-radius: 0 0 4px 4px;
+            background-color: rgba(30, 30, 30, 0.7);
+            border-radius: 0 0 8px 8px;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .collapsible.active + .collapsible-content {
+            max-height: 500px;
+            padding: 1rem;
         }
 
         #score {
-            font-size: 1.2em;
-            margin-bottom: 20px;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary-color);
         }
 
         #timer {
-            font-size: 1em;
-            margin-bottom: 20px;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+            opacity: 0.8;
         }
 
         #hangman {
-            margin: 20px 0;
+            margin: 1.5rem 0;
         }
 
         #hangman-svg {
@@ -144,112 +222,144 @@
         }
 
         #word-display {
-            font-size: 2em;
-            margin: 20px 0;
+            font-size: 2rem;
+            margin: 1.5rem 0;
             letter-spacing: 10px;
             min-height: 50px;
+            font-weight: 600;
+            color: var(--primary-color);
         }
 
         #letters {
-            margin: 20px 0;
+            margin: 1.5rem 0;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 5px;
+            gap: 8px;
         }
 
         .letter-button {
-            font-size: 1.2em;
-            padding: 10px;
-            width: 40px;
+            font-size: 1.1rem;
+            padding: 0.8rem;
+            width: 44px;
             cursor: pointer;
-            background-color: #007bff;
-            color: white;
+            background-color: rgba(55, 0, 179, 0.3);
+            color: var(--text-color);
             border: none;
-            border-radius: 5px;
-            transition: all 0.2s;
+            border-radius: 8px;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         .letter-button:hover:not(:disabled) {
-            background-color: #0056b3;
+            background-color: rgba(55, 0, 179, 0.5);
+            transform: translateY(-2px);
         }
 
         .letter-button:disabled {
-            background-color: #ccc;
+            opacity: 0.7;
             cursor: not-allowed;
         }
 
         .letter-button.correct {
-            background-color: #28a745;
+            background-color: var(--success-color);
+            color: white;
         }
 
         .letter-button.wrong {
-            background-color: #dc3545;
+            background-color: var(--error-color);
+            color: white;
         }
 
         #message {
-            font-size: 1.5em;
-            margin: 20px 0;
+            font-size: 1.3rem;
+            margin: 1.5rem 0;
             min-height: 30px;
+            font-weight: 500;
         }
 
         #translation {
-            font-size: 1.2em;
-            margin: 20px 0;
-            color: #555;
+            font-size: 1.1rem;
+            margin: 1.5rem 0;
+            color: var(--secondary-color);
+            font-style: italic;
         }
 
         .button-group {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
+            gap: 12px;
+            margin-top: 1.5rem;
             flex-wrap: wrap;
         }
 
         .action-button {
-            padding: 10px 20px;
-            font-size: 1em;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
             cursor: pointer;
-            background-color: #6c757d;
+            background-color: #333;
             color: white;
             border: none;
-            border-radius: 5px;
-            transition: all 0.2s;
+            border-radius: 8px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
         .action-button:hover {
-            background-color: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Fügen Sie dies zum CSS-Block hinzu */
+        .action-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+            background-color: #555 !important;
+        }
+
+        .letter-button:disabled:not(.correct):not(.wrong) {
+            opacity: 0.5;
+            background-color: rgba(55, 0, 179, 0.1);
         }
 
         #reset-button {
-            background-color: #28a745;
+            background-color: var(--success-color);
         }
 
         #reset-button:hover {
-            background-color: #218838;
+            background-color: #3e8e41;
         }
 
         #voice-button {
-            background-color: #17a2b8;
+            background-color: var(--secondary-color);
+            color: #121212;
         }
 
         #voice-button:hover {
-            background-color: #138496;
+            background-color: #00b4a0;
         }
 
         #voice-button.listening {
-            background-color: #dc3545;
+            background-color: var(--error-color);
             animation: pulse 1.5s infinite;
         }
 
         #settings-button {
-            background-color: #ffc107;
-            color: #212529;
+            background-color: var(--primary-color);
+            color: #121212;
         }
 
         #settings-button:hover {
-            background-color: #e0a800;
+            background-color: #a370d8;
+        }
+
+        #voice-status {
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: var(--text-color);
+            opacity: 0.8;
         }
 
         @keyframes pulse {
@@ -258,10 +368,55 @@
             100% { transform: scale(1); }
         }
 
-        #voice-status {
-            margin: 10px 0;
-            font-size: 0.9em;
-            color: #666;
+        /* SVG Styling */
+        line, circle {
+            stroke: var(--primary-color);
+            stroke-width: 3;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            #word-display {
+                font-size: 1.5rem;
+                letter-spacing: 6px;
+            }
+            
+            .letter-button {
+                width: 36px;
+                padding: 0.6rem;
+                font-size: 1rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .action-button {
+                width: 100%;
+            }
+        }
+
+        /* Fancy background effect */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(187, 134, 252, 0.1) 0%, transparent 70%);
+            z-index: -1;
+            animation: rotate 60s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -974,10 +1129,20 @@
                 const lessons = Object.keys(words);
                 const defaultProb = 100 / lessons.length;
                 lessons.forEach(lesson => {
-                lessonProbabilities[lesson] = defaultProb;
+                    lessonProbabilities[lesson] = defaultProb;
                 });
             }
             
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.disabled = false;
+                if (button.classList.contains('letter-button') && 
+                    !button.classList.contains('correct') && 
+                    !button.classList.contains('wrong')) {
+                    button.style.opacity = '1';
+                }
+            });
+
             selectedWordObj = getRandomWord();
             guessedLetters = [];
             mistakes = 0;
@@ -1055,160 +1220,130 @@
             return lessons[0];
         }
 
-// Initialisierung der Lektionen-Controls
-function createLessonProbabilityControls() {
-  lessonProbabilitiesDiv.innerHTML = "";
-  
-  // Numerisch sortierte Lektionen (L1, L2, L3,...)
-  const lessons = Object.keys(words).sort((a, b) => {
-    return parseInt(a.substring(1)) - parseInt(b.substring(1));
-  });
-  
-  const activeLessons = lessons.filter(lesson => lessonProbabilities[lesson] > 0);
-  
-  lessons.forEach(lesson => {
-    const div = document.createElement("div");
-    div.className = "lesson-control";
-    
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.id = `check-${lesson}`;
-    checkbox.checked = activeLessons.includes(lesson);
-    checkbox.addEventListener("change", () => toggleLessonActive(lesson));
-    
-    const label = document.createElement("label");
-    label.htmlFor = `check-${lesson}`;
-    label.textContent = `Lektion ${lesson.substring(1)}`; // Zeigt nur die Zahl an (ohne "L")
-    
-    const input = document.createElement("input");
-    input.type = "number";
-    input.id = `prob-${lesson}`;
-    input.min = "0";
-    input.max = "100";
-    input.step = "1";
-    input.value = lessonProbabilities[lesson] ? parseFloat(lessonProbabilities[lesson].toFixed(2)) : 0;
-    input.disabled = !checkbox.checked;
-    input.addEventListener("input", () => normalizeProbabilities());
-    
-    const span = document.createElement("span");
-    span.textContent = "%";
-    
-    div.appendChild(checkbox);
-    div.appendChild(label);
-    div.appendChild(input);
-    div.appendChild(span);
-    lessonProbabilitiesDiv.appendChild(div);
-  });
-}
+        // Initialisierung der Lektionen-Controls
+        function createLessonProbabilityControls() {
+            lessonProbabilitiesDiv.innerHTML = "";
+            
+            // Numerisch sortierte Lektionen (L1, L2, L3,...)
+            const lessons = Object.keys(words).sort((a, b) => {
+                return parseInt(a.substring(1)) - parseInt(b.substring(1));
+            });
+            
+            const activeLessons = lessons.filter(lesson => lessonProbabilities[lesson] > 0);
+            
+            lessons.forEach(lesson => {
+                const div = document.createElement("div");
+                div.className = "lesson-control";
+                
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.id = `check-${lesson}`;
+                checkbox.checked = activeLessons.includes(lesson);
+                checkbox.addEventListener("change", () => toggleLessonActive(lesson));
+                
+                const label = document.createElement("label");
+                label.htmlFor = `check-${lesson}`;
+                label.textContent = `Lektion ${lesson.substring(1)}`; // Zeigt nur die Zahl an (ohne "L")
+                
+                const input = document.createElement("input");
+                input.type = "number";
+                input.id = `prob-${lesson}`;
+                input.min = "0";
+                input.max = "100";
+                input.step = "1";
+                input.value = lessonProbabilities[lesson] ? parseFloat(lessonProbabilities[lesson].toFixed(2)) : 0;
+                input.disabled = !checkbox.checked;
+                input.addEventListener("input", () => normalizeProbabilities());
+                
+                const span = document.createElement("span");
+                span.textContent = "%";
+                
+                div.appendChild(checkbox);
+                div.appendChild(label);
+                div.appendChild(input);
+                div.appendChild(span);
+                lessonProbabilitiesDiv.appendChild(div);
+            });
+        }
 
-// Lektion aktivieren/deaktivieren
-// Lektion aktivieren/deaktivieren
-function toggleLessonActive(lesson) {
-  const checkbox = document.getElementById(`check-${lesson}`);
-  const input = document.getElementById(`prob-${lesson}`);
-  
-  if (checkbox.checked) {
-    // Lektion aktivieren - setze auf Standardwert
-    input.disabled = false;
-    
-    // Berechne neue Standardwahrscheinlichkeit (gleichmäßig verteilt)
-    const activeLessons = getActiveLessons();
-    const newProb = activeLessons.length > 0 ? (100 / activeLessons.length) : 0;
-    
-    // Setze den Wert und aktualisiere die Anzeige
-    input.value = newProb.toFixed(2);
-    lessonProbabilities[lesson] = newProb;
-  } else {
-    // Lektion deaktivieren - setze auf 0
-    input.disabled = true;
-    input.value = "0";
-    lessonProbabilities[lesson] = 0;
-  }
-  
-  // Neuberechnung aller Wahrscheinlichkeiten
-  normalizeProbabilities();
-}
-
-// Hilfsfunktion um aktive Lektionen zu erhalten
-function getActiveLessons() {
-  const lessons = Object.keys(words);
-  return lessons.filter(lesson => {
-    const checkbox = document.getElementById(`check-${lesson}`);
-    return checkbox.checked;
-  });
-}
-
-// Wahrscheinlichkeiten automatisch anpassen
-// Wahrscheinlichkeiten automatisch anpassen
-function normalizeProbabilities() {
-  const activeLessons = getActiveLessons();
-  
-  // Wenn keine aktiven Lektionen: nichts tun
-  if (activeLessons.length === 0) return;
-  
-  // Gleichmäßige Verteilung berechnen
-  const equalProb = 100 / activeLessons.length;
-  
-  // Werte setzen
-  activeLessons.forEach(lesson => {
-    const input = document.getElementById(`prob-${lesson}`);
-    input.value = equalProb.toFixed(2);
-    lessonProbabilities[lesson] = equalProb;
-  });
-}
-
-// Normalisierungs-Button
-document.getElementById("normalize-probs").addEventListener("click", normalizeProbabilities);
-
-        // Einstellungen speichern
-        function saveLessonProbabilities() {
-        const lessons = Object.keys(words);
-        const newProbs = {};
-        let total = 0;
-        
-        lessons.forEach(lesson => {
+        // Lektion aktivieren/deaktivieren
+        function toggleLessonActive(lesson) {
             const checkbox = document.getElementById(`check-${lesson}`);
             const input = document.getElementById(`prob-${lesson}`);
-            const value = checkbox.checked ? (parseFloat(input.value) || 0) : 0;
-            newProbs[lesson] = value;
-            total += value;
-        });
-        
-        // Falls Summe 0, Standardwerte setzen
-        if (total === 0) {
-            const activeCount = lessons.filter(l => document.getElementById(`check-${l}`).checked).length || 1;
-            lessons.forEach(lesson => {
-            newProbs[lesson] = document.getElementById(`check-${lesson}`).checked ? (100 / activeCount) : 0;
-            });
-        }
-        
-        lessonProbabilities = newProbs;
-        }
-
-        // Speichert die eingestellten Wahrscheinlichkeiten
-        function saveLessonProbabilities() {
-            const inputs = lessonProbabilitiesDiv.querySelectorAll("input");
-            let total = 0;
             
-            // Sammle alle Werte und berechne die Summe
-            const newProbs = {};
-            inputs.forEach(input => {
-                const lesson = input.id.substring(5); // "prob-L1" -> "L1"
-                const value = parseFloat(input.value) || 0;
-                newProbs[lesson] = value;
-                total += value;
-            });
-            
-            // Wenn Summe 0 ist, setze Standardwerte
-            if (total === 0) {
-                const lessonCount = Object.keys(words).length;
-                const defaultProb = parseFloat((100 / lessonCount).toFixed(3));
-                for (const lesson in words) {
-                    newProbs[lesson] = defaultProb;
-                }
+            if (checkbox.checked) {
+                // Lektion aktivieren - setze auf Standardwert
+                input.disabled = false;
+                
+                // Berechne neue Standardwahrscheinlichkeit (gleichmäßig verteilt)
+                const activeLessons = getActiveLessons();
+                const newProb = activeLessons.length > 0 ? (100 / activeLessons.length) : 0;
+                
+                // Setze den Wert und aktualisiere die Anzeige
+                input.value = newProb.toFixed(2);
+                lessonProbabilities[lesson] = newProb;
+            } else {
+                // Lektion deaktivieren - setze auf 0
+                input.disabled = true;
+                input.value = "0";
+                lessonProbabilities[lesson] = 0;
             }
             
-            lessonProbabilities = newProbs;
+            // Neuberechnung aller Wahrscheinlichkeiten
+            normalizeProbabilities();
+        }
+
+        // Hilfsfunktion um aktive Lektionen zu erhalten
+        function getActiveLessons() {
+            const lessons = Object.keys(words);
+            return lessons.filter(lesson => {
+                const checkbox = document.getElementById(`check-${lesson}`);
+                return checkbox.checked;
+            });
+        }
+
+        // Wahrscheinlichkeiten automatisch anpassen
+        function normalizeProbabilities() {
+            const activeLessons = getActiveLessons();
+            
+            // Wenn keine aktiven Lektionen: nichts tun
+            if (activeLessons.length === 0) return;
+            
+            // Gleichmäßige Verteilung berechnen
+            const equalProb = 100 / activeLessons.length;
+            
+            // Werte setzen
+            activeLessons.forEach(lesson => {
+                const input = document.getElementById(`prob-${lesson}`);
+                input.value = equalProb.toFixed(2);
+                lessonProbabilities[lesson] = equalProb;
+            });
+        }
+
+        // Normalisierungs-Button
+        document.getElementById("normalize-probs").addEventListener("click", normalizeProbabilities);
+
+        // Einstellungen speichern
+        function saveSettings() {
+            // 1. Einstellungen speichern
+            displayMode = displayModeSelect.value;
+            wordLengthPref = wordLengthSelect.value;
+            
+            // Lektionen-Wahrscheinlichkeiten speichern
+            const lessons = Object.keys(words);
+            lessons.forEach(lesson => {
+                const input = document.getElementById(`prob-${lesson}`);
+                if (input) {
+                    lessonProbabilities[lesson] = parseFloat(input.value) || 0;
+                }
+            });
+
+            // Animation für das Schließen
+            settingsPanel.style.animation = "fadeOut 0.3s ease-out";
+            setTimeout(() => {
+                settingsPanel.style.display = "none";
+                settingsPanel.style.animation = "";
+            }, 300);
         }
 
         // Wortanzeige aktualisieren
@@ -1256,6 +1391,9 @@ document.getElementById("normalize-probs").addEventListener("click", normalizePr
                     if (btn.textContent === letter) {
                         btn.classList.add("wrong");
                         btn.disabled = true;
+                        // Animation für falschen Buchstaben
+                        btn.style.animation = "shake 0.5s";
+                        setTimeout(() => btn.style.animation = "", 500);
                     }
                 });
                 updateHangmanDisplay();
@@ -1264,6 +1402,9 @@ document.getElementById("normalize-probs").addEventListener("click", normalizePr
                     if (btn.textContent === letter) {
                         btn.classList.add("correct");
                         btn.disabled = true;
+                        // Animation für richtigen Buchstaben
+                        btn.style.animation = "pop 0.3s";
+                        setTimeout(() => btn.style.animation = "", 300);
                     }
                 });
             }
@@ -1299,23 +1440,60 @@ document.getElementById("normalize-probs").addEventListener("click", normalizePr
             hangmanSvg.innerHTML = "";
         }
 
-        // Spielstatus prüfen
         function checkGameStatus() {
             if (selectedWordObj.word.split("").every(letter => guessedLetters.includes(letter))) {
                 messageDiv.textContent = "Gewonnen!";
+                messageDiv.style.color = "var(--success-color)";
                 translationDiv.textContent = `Deutsche Bedeutung: ${selectedWordObj.translation}`;
                 wins++;
                 winsSpan.textContent = wins;
                 gameEnded = true;
                 clearInterval(timerInterval);
+                
+                // Deaktiviere alle Buttons
+                disableAllButtons();
+                
+                // Gewinner-Animation
+                wordDisplay.style.animation = "celebrate 1s";
+                setTimeout(() => wordDisplay.style.animation = "", 1000);
             } else if (displayMode === "all" ? mistakes >= 1 : mistakes >= Math.ceil(hangmanParts.length / displayMode)) {
                 messageDiv.textContent = `Verloren! Das Wort war: ${selectedWordObj.word}`;
+                messageDiv.style.color = "var(--error-color)";
                 translationDiv.textContent = `Deutsche Bedeutung: ${selectedWordObj.translation}`;
                 losses++;
                 lossesSpan.textContent = losses;
                 gameEnded = true;
                 clearInterval(timerInterval);
+                
+                // Deaktiviere alle Buttons
+                disableAllButtons();
+                
+                // Verlierer-Animation
+                hangmanSvg.style.animation = "shake 0.5s";
+                setTimeout(() => hangmanSvg.style.animation = "", 500);
             }
+        }
+
+        // Neue Funktion zum Deaktivieren aller Buttons
+        function disableAllButtons() {
+            // Deaktiviere Buchstaben-Buttons
+            const letterButtons = document.querySelectorAll('.letter-button');
+            letterButtons.forEach(button => {
+                if (!button.disabled) {
+                    button.disabled = true;
+                    if (!button.classList.contains('correct') && !button.classList.contains('wrong')) {
+                        button.style.opacity = '0.5';
+                    }
+                }
+            });
+            
+            // Deaktiviere Action-Buttons (außer Neustart)
+            const actionButtons = document.querySelectorAll('.action-button');
+            actionButtons.forEach(button => {
+                if (button.id !== 'reset-button') {
+                    button.disabled = true;
+                }
+            });
         }
 
         // Timer aktualisieren
@@ -1333,8 +1511,8 @@ document.getElementById("normalize-probs").addEventListener("click", normalizePr
             line.setAttribute("y1", y1);
             line.setAttribute("x2", x2);
             line.setAttribute("y2", y2);
-            line.setAttribute("stroke", "black");
-            line.setAttribute("stroke-width", "2");
+            line.setAttribute("stroke", "var(--primary-color)");
+            line.setAttribute("stroke-width", "3");
             svg.appendChild(line);
         }
 
@@ -1343,14 +1521,13 @@ document.getElementById("normalize-probs").addEventListener("click", normalizePr
             circle.setAttribute("cx", cx);
             circle.setAttribute("cy", cy);
             circle.setAttribute("r", r);
-            circle.setAttribute("stroke", "black");
-            circle.setAttribute("stroke-width", "2");
+            circle.setAttribute("stroke", "var(--primary-color)");
+            circle.setAttribute("stroke-width", "3");
             circle.setAttribute("fill", "transparent");
             svg.appendChild(circle);
         }
 
         // Spracherkennung
-// Spracherkennung
         function initSpeechRecognition() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
@@ -1412,8 +1589,6 @@ document.getElementById("normalize-probs").addEventListener("click", normalizePr
             return true;
         }
 
-
-        
         function toggleVoiceRecognition() {
             if (!recognition) {
                 if (!initSpeechRecognition()) {
@@ -1442,7 +1617,6 @@ document.getElementById("normalize-probs").addEventListener("click", normalizePr
         }
 
         function stopVoiceRecognition() {
-            if (restartTimeout) clearTimeout(restartTimeout);
             isListening = false;
             if (recognition) {
                 try {
@@ -1480,63 +1654,38 @@ document.getElementById("normalize-probs").addEventListener("click", normalizePr
             }
         }
 
-        function toggleVoiceRecognition() {
-            if (!recognition) {
-                if (!initSpeechRecognition()) {
-                    alert("Spracherkennung wird in diesem Browser nicht unterstützt!");
-                    return;
-                }
-            }
-
-            if (isListening) {
-                stopVoiceRecognition();
-            } else {
-                startVoiceRecognition();
-            }
-        }
-
-        function startVoiceRecognition() {
-            if (!recognition && !initSpeechRecognition()) {
-                return;
-            }
-            try {
-                recognition.start();
-            } catch (e) {
-                console.error("Start fehlgeschlagen:", e);
-                voiceStatus.textContent = "Fehler: " + e.message;
-            }
-        }
-
-        function stopVoiceRecognition() {
-            isListening = false;
-            if (recognition) {
-                try {
-                    recognition.stop();
-                } catch (e) {
-                    console.error("Stopp fehlgeschlagen:", e);
-                }
-            }
-            voiceButton.classList.remove("listening");
-            voiceStatus.textContent = "Spracherkennung: Inaktiv";
-        }
-
         // Einstellungen
         function toggleSettings() {
-            settingsPanel.style.display = settingsPanel.style.display === "block" ? "none" : "block";
             if (settingsPanel.style.display === "block") {
+                // 1. Einstellungen speichern
+                displayMode = displayModeSelect.value;
+                wordLengthPref = wordLengthSelect.value;
+                
+                // Lektionen-Wahrscheinlichkeiten speichern
+                const lessons = Object.keys(words);
+                lessons.forEach(lesson => {
+                    const input = document.getElementById(`prob-${lesson}`);
+                    if (input) {
+                        lessonProbabilities[lesson] = parseFloat(input.value) || 0;
+                    }
+                });
+
+                // Animation für das Schließen
+                settingsPanel.style.animation = "fadeOut 0.3s ease-out";
+                setTimeout(() => {
+                    settingsPanel.style.display = "none";
+                    settingsPanel.style.animation = "";
+                }, 300);
+            } else {
                 // Aktuelle Einstellungen in Formular übernehmen
                 displayModeSelect.value = displayMode;
                 wordLengthSelect.value = wordLengthPref;
                 createLessonProbabilityControls();
+                
+                // Animation für das Öffnen
+                settingsPanel.style.display = "block";
+                settingsPanel.style.animation = "fadeIn 0.3s ease-out";
             }
-        }
-
-        function saveSettings() {
-            displayMode = displayModeSelect.value;
-            wordLengthPref = wordLengthSelect.value;
-            saveLessonProbabilities();
-            settingsPanel.style.display = "none";
-            init(); // Neustart mit neuen Einstellungen
         }
 
         // Tastatursteuerung
@@ -1560,10 +1709,12 @@ document.getElementById("normalize-probs").addEventListener("click", normalizePr
             button.addEventListener("click", function() {
                 this.classList.toggle("active");
                 const content = this.nextElementSibling;
-                if (content.style.display === "block") {
-                    content.style.display = "none";
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                    content.style.padding = "0";
                 } else {
-                    content.style.display = "block";
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    content.style.padding = "1rem";
                 }
             });
         });
